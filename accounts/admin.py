@@ -32,7 +32,7 @@ class CustomUserAdmin(BaseUserAdmin):
     readonly_fields = ('date_joined',)
 
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('tenant', 'email', 'password')}),
         (_('Personal Info'), {'fields': ('name',)}),
         (_('Permissions'), {
             'fields': (
