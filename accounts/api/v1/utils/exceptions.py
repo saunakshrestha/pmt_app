@@ -158,7 +158,7 @@ def custom_429(request: HttpRequest, exc: Exception, *args, **kwargs) -> HttpRes
 def custom_http_error(request: HttpRequest, exc: HttpError, *args, **kwargs) -> HttpResponse:
     # Map HTTP status codes to string codes and default messages
     code_map = {
-        400: ("BAD_REQUEST", "The request could not be understood or was missing required parameters."),
+        400: ("INVALID_INPUT", "The request could not be understood or was missing required parameters."),
         401: ("UNAUTHORIZED", "Authentication credentials were missing or incorrect."),
         403: ("FORBIDDEN", "You do not have permission to perform this action."),
         404: ("NOT_FOUND", "The requested resource was not found."),

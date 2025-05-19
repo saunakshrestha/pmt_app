@@ -1,40 +1,9 @@
 from django.contrib import admin
 from .models import (
-    Resource, Role, RolePermission,
     Project, ProjectMember,
     Board, Sprint, Label,
     Task, Comment, ActivityLog
 )
-
-# --------------------------
-# Permissions and Roles
-# --------------------------
-
-@admin.register(Resource)
-class ResourceAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name')
-    search_fields = ('code', 'name')
-
-
-class RolePermissionInline(admin.TabularInline):
-    model = RolePermission
-    extra = 1
-
-
-@admin.register(Role)
-class RoleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'tenant', 'description')
-    search_fields = ('name',)
-    list_filter = ('tenant',)
-    inlines = [RolePermissionInline]
-
-
-@admin.register(RolePermission)
-class RolePermissionAdmin(admin.ModelAdmin):
-    list_display = ('role', 'resource', 'action', 'is_allowed')
-    list_filter = ('action', 'is_allowed', 'resource')
-    search_fields = ('role__name', 'resource__name')
-
 
 # --------------------------
 # Projects and Memberships
@@ -89,7 +58,8 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description')
     list_filter = ('status', 'task_type', 'priority', 'board', 'labels')
     autocomplete_fields = ('assignee', 'created_by', 'updated_by')
-    raw_id_fields = ('labels',)
+
+    filter_horizontal = ('labels',)
 
 
 @admin.register(Comment)
@@ -105,6 +75,10 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(ActivityLog)
 class ActivityLogAdmin(admin.ModelAdmin):
-    list_display = ('actor', 'target', 'action', 'created_at')
-    search_fields = ('action', 'metadata')
-    list_filter = ('created_at', 'actor')
+    list_display = ('id','actor', 'action', 'target_type', 'created_at')
+    list_display_links = ('id', 'actor', 'action')
+    search_fields = ('actor__email', 'action', 'target_type')
+    list_filter = ('action', 'target_type', 'created_at')
+    ordering = ('-created_at',)
+    list_per_page = 20
+    list_select_related = ('actor', 'project')

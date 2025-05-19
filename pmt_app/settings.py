@@ -37,10 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
+    'channels',
     'corsheaders',
     'accounts',
     'projects',
+    'realtime',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.current_user.CurrentUserMiddleware',
 ]
 
 ROOT_URLCONF = 'pmt_app.urls'
@@ -72,7 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'pmt_app.wsgi.application'
-
+ASGI_APPLICATION = 'pmt_app.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -140,7 +144,18 @@ CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# settings.py
+# Redis
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+
+# logging
 
 LOGGING = {
     'version': 1,
