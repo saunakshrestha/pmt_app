@@ -43,8 +43,8 @@ coverage.xml
 .hypothesis/
 
 # Migrations (optional, if you want to ignore generated migrations)
-# **/migrations/
-# !**/migrations/__init__.py
+ **/migrations/
+ !**/migrations/__init__.py
 
 # Pytest
 .pytest_cache/
