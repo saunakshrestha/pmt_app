@@ -151,11 +151,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http:\/\/localhost:50\d{2}$",        # Matches http://localhost:5000–5099
-    r"^http:\/\/127\.0\.0\.1:50\d{2}$",      # Matches http://127.0.0.1:5000–5099
-]
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGIN_REGEXES = [
+#     r"^http:\/\/localhost:50\d{2}$",        # Matches http://localhost:5000–5099
+#     r"^http:\/\/127\.0\.0\.1:50\d{2}$",      # Matches http://127.0.0.1:5000–5099
+# ]
 CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'accounts.CustomUser'

@@ -42,9 +42,12 @@ coverage.xml
 *.cover
 .hypothesis/
 
-# Migrations (optional, if you want to ignore generated migrations)
- **/migrations/
- !**/migrations/__init__.py
+# Ignore all migration files except __init__.py
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Also ignore compiled files inside migrations
+**/migrations/*.pyc
 
 # Pytest
 .pytest_cache/
