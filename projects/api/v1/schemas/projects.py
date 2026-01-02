@@ -1,4 +1,3 @@
-from email.policy import default
 
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
@@ -127,9 +126,9 @@ class TaskIn(Schema):
 class TaskPatchIn(Schema):
     title: Optional[str]
     description: Optional[str] = ""
-    task_type: Optional[str] = default
-    status: Optional[str] = default
-    priority: Optional[str] = default
+    task_type: Optional[str] = None
+    status: Optional[str] = None
+    priority: Optional[str] = None
     assignee_id: Optional[int] = None
     label_ids: Optional[List[int]] = None
     sprint_id: Optional[int] = None
