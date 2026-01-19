@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Saved Documents</title>
+</head>
+<body>
+    <h1>Saved Documents</h1>
+    <ul>
+        {% for doc in documents %}
+            <li>{{ doc }} - <a href="{% url 'preview_document' %}?id={{ doc.id }}">Preview</a> - <a href="{% url 'export_pdf' %}?id={{ doc.id }}">PDF</a></li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'create_document' %}">Create New</a>
+</body>
+</html>

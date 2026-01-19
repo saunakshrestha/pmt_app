@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><title>Create Document</title></head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <h2>Items</h2>
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {{ form.as_p }}
+        {% endfor %}
+        <button type="submit">Save and Preview</button>
+    </form>
+</body>
+
+
+// Simple JS to add more item forms (append to form.html)
+<script>
+    document.querySelector('form').addEventListener('click', function(e) {
+        if (e.target.textContent === 'Add Item') {
+            // Clone last form and increment IDs (basic example)
+        }
+    });
+</script>
+</html>
+
