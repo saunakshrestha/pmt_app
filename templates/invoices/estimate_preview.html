@@ -1,4 +1,4 @@
-{% load invoice_extras %}
+{% load static invoice_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,6 +70,17 @@
             .screen-only {
                 display: none !important;
             }
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .company-logo {
+            height: 60px;
+            max-width: 180px;
+            object-fit: contain;
         }
         .doc-title {
             font-family: 'Montserrat', sans-serif;
@@ -246,7 +257,10 @@
         </form>
         <a href="{% url 'export_estimate_pdf' %}" class="download-btn">📥 Download PDF</a>
     </div>
-    <div class="doc-title">ESTIMATE</div>
+    <div class="header-container">
+        <div class="doc-title">ESTIMATE</div>
+        <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
+    </div>
     
     <div class="info-container">
         <div class="info-left">

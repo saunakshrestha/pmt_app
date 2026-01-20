@@ -1,4 +1,4 @@
-{% load invoice_extras %}
+{% load static invoice_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,6 +22,14 @@
             margin-bottom: 30px;
             font-size: 14pt;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .company-logo {
+            height: 50px;
+            max-width: 150px;
+            object-fit: contain;
         }
         .doc-title {
             font-size: 18pt;
@@ -168,7 +176,10 @@
 <body>
     {% if document.doc_type == "invoice" %}
         <!-- TAX INVOICE LAYOUT -->
-        <div class="company-header">MochaTech Pty Ltd</div>
+        <div class="company-header">
+            <span>MochaTech Pty Ltd</span>
+            <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
+        </div>
         
         <div class="doc-title">TAX INVOICE</div>
         
@@ -262,7 +273,10 @@
         
     {% else %}
         <!-- ESTIMATE LAYOUT -->
-        <div class="doc-title">ESTIMATE</div>
+        <div class="header-container" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div class="doc-title" style="margin: 0;">ESTIMATE</div>
+            <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
+        </div>
         
         <div class="info-container">
             <div class="info-left">

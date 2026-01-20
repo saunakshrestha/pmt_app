@@ -1,4 +1,4 @@
-{% load invoice_extras %}
+{% load static invoice_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,6 +76,14 @@
             margin-bottom: 15px;
             font-size: 11pt;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .company-logo {
+            height: 50px;
+            max-width: 150px;
+            object-fit: contain;
         }
         .doc-title {
             font-size: 14pt;
@@ -227,7 +235,11 @@
         </form>
         <a href="{% url 'export_invoice_pdf' %}" class="download-btn">📥 Download PDF</a>
     </div>
-    <div class="company-header">MochaTech Pty Ltd</div>
+    <div class="company-header">
+        <span>MochaTech Pty Ltd</span>
+        
+        <img src="{% static 'images/company-logo.png' %}" alt="Company Logo" class="company-logo">
+    </div>
     
     <div class="doc-title">TAX INVOICE</div>
     
