@@ -16,6 +16,28 @@
             padding: 0;
             color: #000;
         }
+        /* A4 page container for screen view */
+        @media screen {
+            body {
+                background-color: #e0e0e0;
+                padding: 20px;
+            }
+            .page-container {
+                max-width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                padding: 20mm;
+            }
+        }
+        @media print {
+            .page-container {
+                max-width: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
         .company-header {
             background-color: #d4e6f1;
             padding: 12px 15px;
@@ -174,6 +196,7 @@
     </style>
 </head>
 <body>
+    <div class="page-container">
     {% if document.doc_type == "invoice" %}
         <!-- TAX INVOICE LAYOUT -->
         <div class="company-header">
@@ -364,6 +387,7 @@
             </div>
         </div>
     {% endif %}
+    </div>
     
 </body>
 </html>

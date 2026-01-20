@@ -19,6 +19,28 @@
             color: #000;
             line-height: 1.3;
         }
+        /* A4 page container for screen view */
+        @media screen {
+            body {
+                background-color: #e0e0e0;
+                padding: 20px;
+            }
+            .page-container {
+                max-width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                padding: 8mm;
+            }
+        }
+        @media print {
+            .page-container {
+                max-width: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
         /* Screen-only elements (hidden in PDF) */
         @media screen {
             .screen-only {
@@ -257,6 +279,7 @@
         </form>
         <a href="{% url 'export_estimate_pdf' %}" class="download-btn">📥 Download PDF</a>
     </div>
+    <div class="page-container">
     <div class="header-container">
         <div class="doc-title">ESTIMATE</div>
         <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
@@ -281,8 +304,6 @@
                 WA, 6058.<br>
                 Australia
             </div>
-        </div>
-    </div>
         </div>
     </div>
     
@@ -348,6 +369,8 @@
         <div class="info-box">
             {{ estimate.payment_terms|safe }}
         </div>
+    </div>
+    
     </div>
     
 
