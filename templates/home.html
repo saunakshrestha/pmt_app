@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #ededed 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -132,6 +132,31 @@
             transform: translateY(-2px);
         }
 
+        .hidden-btn {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 18px;
+            height: 18px;
+            background: rgba(102, 126, 234, 0.08);
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: rgba(102, 126, 234, 0.2);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .hidden-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            color: rgba(102, 126, 234, 0.4);
+            transform: scale(1.15);
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 1rem;
@@ -175,5 +200,7 @@
             <span class="tech-item">JavaScript</span>
         </div>
     </div>
+    
+    <a href="/invoices/" class="hidden-btn">+</a>
 </body>
 </html>
