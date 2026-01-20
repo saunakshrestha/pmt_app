@@ -159,13 +159,109 @@
             font-size: 0.9rem;
             opacity: 0.9;
         }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-name {
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .login-btn {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .login-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .protected-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .protected-info strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.05rem;
+        }
     </style>
 </head>
 <body>
+    <!-- User info in top right corner -->
+    {% if user.is_authenticated %}
+        <div class="user-info">
+            <span class="user-name">👤 {{ user.name|default:user.username }}</span>
+            <a href="{% url 'portal_logout' %}" class="logout-btn">Logout</a>
+        </div>
+    {% else %}
+        <div class="user-info">
+            <a href="{% url 'portal_login' %}" class="login-btn">🔐 Login</a>
+        </div>
+    {% endif %}
+    
     <div class="container">
+        {% if messages %}
+            <div style="margin-bottom: 30px;">
+                {% for message in messages %}
+                    <div style="background: rgba(255,255,255,0.9); padding: 15px 20px; border-radius: 10px; margin-bottom: 10px; 
+                                {% if message.tags == 'success' %}border-left: 4px solid #27ae60;{% elif message.tags == 'error' %}border-left: 4px solid #e74c3c;{% else %}border-left: 4px solid #3498db;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
         <div class="header">
             <h1>📊 Invoice & Estimate Portal</h1>
             <p>Create, manage, and track your business documents</p>
+            {% if not user.is_authenticated %}
+                <div class="protected-info">
+                    <strong>ℹ️ Login Required</strong>
+                    To create estimates, invoices, or view documents, please <a href="{% url 'portal_login' %}" style="color: white; text-decoration: underline;">login to your account</a>.
+                </div>
+            {% endif %}
         </div>
         
         <div class="card-grid">

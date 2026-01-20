@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Max
 from django.utils import timezone
 from datetime import date, timedelta
@@ -32,6 +33,7 @@ def invoices_home(request):
 
 
 # ESTIMATE VIEWS
+@login_required
 def create_estimate(request, estimate_id=None):
     """Create a new estimate or edit existing one"""
     estimate_instance = None
@@ -192,6 +194,7 @@ def create_estimate(request, estimate_id=None):
     })
 
 
+@login_required
 def preview_estimate(request):
     """Preview an estimate before exporting"""
     data = request.session.get("temp_estimate")
@@ -208,6 +211,7 @@ def preview_estimate(request):
     return render(request, "invoices/estimate_preview.html", {"estimate": data})
 
 
+@login_required
 def save_estimate_from_preview(request):
     """Save estimate from preview page if not already saved"""
     if request.method != "POST":
@@ -264,6 +268,7 @@ def save_estimate_from_preview(request):
     return redirect("preview_estimate")
 
 
+@login_required
 def export_estimate_pdf(request):
     """Export estimate as PDF"""
     data = request.session.get("temp_estimate")
@@ -286,6 +291,7 @@ def export_estimate_pdf(request):
 
 
 # INVOICE VIEWS
+@login_required
 def create_invoice(request, invoice_id=None):
     """Create a new tax invoice or edit existing one"""
     invoice_instance = None
@@ -452,6 +458,7 @@ def create_invoice(request, invoice_id=None):
     })
 
 
+@login_required
 def preview_invoice(request):
     """Preview an invoice before exporting"""
     data = request.session.get("temp_invoice")
@@ -468,6 +475,7 @@ def preview_invoice(request):
     return render(request, "invoices/invoice_preview.html", {"invoice": data})
 
 
+@login_required
 def save_invoice_from_preview(request):
     """Save invoice from preview page if not already saved"""
     if request.method != "POST":
@@ -527,6 +535,7 @@ def save_invoice_from_preview(request):
     return redirect("preview_invoice")
 
 
+@login_required
 def export_invoice_pdf(request):
     """Export invoice as PDF"""
     data = request.session.get("temp_invoice")
@@ -549,6 +558,7 @@ def export_invoice_pdf(request):
 
 
 # LIST VIEW
+@login_required
 def document_list(request):
     """List all invoices and estimates with cards"""
     invoices = Invoice.objects.all().order_by('-created_at')
@@ -587,6 +597,7 @@ def document_list(request):
 
 
 # OLD VIEWS FOR BACKWARD COMPATIBILITY (OPTIONAL)
+@login_required
 def create_document(request):
     """Legacy document creation view"""
     if request.method == "POST":
@@ -638,6 +649,7 @@ def create_document(request):
     return render(request, "invoices/form.html", {"form": form})
 
 
+@login_required
 def preview_document(request):
     """Legacy preview view"""
     data = request.session.get("temp_document")
@@ -647,6 +659,7 @@ def preview_document(request):
     return render(request, "invoices/preview.html", {"document": data})
 
 
+@login_required
 def export_pdf(request):
     """Legacy PDF export"""
     data = request.session.get("temp_document")

@@ -161,7 +161,21 @@ CORS_ALLOW_ALL_ORIGINS = True
 # ]
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv())
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrUsernameBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Login settings
+LOGIN_URL = 'portal_login'
+LOGIN_REDIRECT_URL = 'invoices_home'
+LOGOUT_REDIRECT_URL = 'invoices_home'
 
 # Redis
 CHANNEL_LAYERS = {
