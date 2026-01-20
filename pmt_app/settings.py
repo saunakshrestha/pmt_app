@@ -48,9 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'corsheaders',
+    'tinymce',
     'accounts',
     'projects',
     'realtime',
+    'invoices',
 ]
 
 MIDDLEWARE = [
@@ -159,7 +161,21 @@ CORS_ALLOW_ALL_ORIGINS = True
 # ]
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv())
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrUsernameBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Login settings
+LOGIN_URL = 'portal_login'
+LOGIN_REDIRECT_URL = 'invoices_home'
+LOGOUT_REDIRECT_URL = 'invoices_home'
 
 # Redis
 CHANNEL_LAYERS = {
@@ -210,4 +226,15 @@ LOGGING = {
         'handlers': ['console'],
         'level': 'WARNING',
     },
+}
+
+# TinyMCE Configuration
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 300,
+    "menubar": False,
+    "plugins": "lists link code",
+    "toolbar": "undo redo | bold italic underline | numlist bullist | removeformat",
+    "content_style": "body { font-family: Arial, sans-serif; font-size: 14px; }",
+    "branding": False,
+    "promotion": False,
 }

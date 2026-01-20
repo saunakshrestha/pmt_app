@@ -17,6 +17,7 @@ Django==5.2.1
 django-cors-headers==4.7.0
 django-extensions==4.1
 django-ninja==1.4.1
+django-tinymce==5.0.0
 fonttools==4.61.1
 gunicorn==23.0.0
 hyperlink==21.0.0

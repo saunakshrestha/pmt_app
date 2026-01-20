@@ -1,0 +1,398 @@
+{% load static invoice_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ document.doc_type|title }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+            font-size: 9pt; 
+            margin: 0;
+            padding: 0;
+            color: #000;
+        }
+        /* A4 page container for screen view */
+        @media screen {
+            body {
+                background-color: #e0e0e0;
+                padding: 20px;
+            }
+            .page-container {
+                max-width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                padding: 20mm;
+            }
+        }
+        @media print {
+            .page-container {
+                max-width: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+        .company-header {
+            background-color: transparent;
+            border-bottom: 2px solid #6d4c41;
+            margin-bottom: 30px;
+            font-size: 14pt;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .company-logo {
+            height: 50px;
+            max-width: 150px;
+            object-fit: contain;
+        }
+        .doc-title {
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 20px 0 30px 0;
+        }
+        .info-container {
+            display: table;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+        .info-left, .info-right {
+            display: table-cell;
+            vertical-align: top;
+            width: 50%;
+        }
+        .info-right {
+            text-align: left;
+            padding-left: 20px;
+        }
+        .info-box {
+            background-color: transparent;
+            border: 1px solid #e0e0e0;
+            margin: 2px 0;
+            font-size: 9pt;
+        }
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 120px;
+        }
+        .customer-box {
+            background-color: #fff3cd;
+            padding: 5px 8px;
+            margin: 2px 0;
+        }
+        .summary-section {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: transparent;
+            border: 1px solid #e0e0e0;
+        }
+        .summary-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .summary-item {
+            background-color: #ffffff;
+            padding: 8px;
+            margin: 3px 0;
+            border: 1px solid #bcaaa4;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table thead {
+            background-color: transparent;
+            border-bottom: 2px solid #6d4c41;
+        }
+        th {
+            padding: 8px 5px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #e0e0e0;
+        }
+        td {
+            padding: 6px 5px;
+            border: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+        .desc-col { width: 45%; }
+        .qty-col { width: 10%; text-align: center; }
+        .price-col { width: 15%; text-align: right; }
+        .gst-col { width: 10%; text-align: center; }
+        .amount-col { width: 20%; text-align: right; }
+        .empty-row td {
+            background-color: #f5f5f5;
+            height: 18px;
+            border: 1px solid #e0e0e0;
+        }
+        .totals-section {
+            margin: 20px 0;
+            text-align: right;
+        }
+        .totals-table {
+            display: inline-block;
+            text-align: right;
+            min-width: 250px;
+        }
+        .totals-row {
+            padding: 5px 0;
+            border-bottom: 1px solid #d0d0d0;
+        }
+        .totals-label {
+            display: inline-block;
+            min-width: 120px;
+            text-align: right;
+            padding-right: 20px;
+        }
+        .totals-value {
+            display: inline-block;
+            min-width: 100px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .grand-total {
+            background-color: #d7ccc8;
+            padding: 8px 10px;
+            margin-top: 5px;
+            font-size: 11pt;
+            font-weight: bold;
+        }
+        .due-date-section {
+            margin: 25px 0;
+            padding: 8px;
+            background-color: #ffffff;
+            font-weight: bold;
+            border: 1px solid #bcaaa4;
+        }
+        .notes-section {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: transparent;
+            border: 1px solid #e0e0e0;
+        }
+        .notes-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .terms-section {
+            margin-top: 30px;
+        }
+        .terms-box {
+            border: 1px solid #a1887f;
+            background-color: #ffffff;
+            min-height: 80px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .payment-terms-title {
+            font-weight: bold;
+            margin: 15px 0 5px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="page-container">
+    {% if document.doc_type == "invoice" %}
+        <!-- TAX INVOICE LAYOUT -->
+        <div class="company-header">
+            <span>MochaTech Pty Ltd</span>
+            <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
+        </div>
+        
+        <div class="doc-title">TAX INVOICE</div>
+        
+        <div class="info-container">
+            <div class="info-left">
+                <div class="customer-box">{{ document.customer_name }}</div>
+                <div class="info-box"><span class="info-label">Attention:</span> {{ document.attention|default:"" }}</div>
+                <div class="info-box">{{ document.customer_address|linebreaksbr }}</div>
+                <div class="info-box"><span class="info-label">ABN:</span> {{ document.customer_abn|default:"" }}</div>
+            </div>
+            <div class="info-right">
+                <div class="info-box"><span class="info-label">Invoice Date</span><br>{{ document.date|date:"d M Y" }}</div>
+                <div class="info-box"><span class="info-label">Invoice Number</span><br>{{ document.number }}</div>
+                <div class="info-box"><span class="info-label">Reference/PO #</span><br>{{ document.po_reference|default:"" }}</div>
+                <div class="info-box" style="margin-top: 10px;">
+                    <strong>MochaTech Pty Ltd</strong><br>
+                    U7, 39 Edinburgh Road<br>
+                    WA, 6058.<br>
+                    Australia
+                </div>
+                <div class="info-box"><span class="info-label">ABN</span><br>{{ document.company_abn|default:"79 690 649 515" }}</div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="desc-col">Description</th>
+                    <th class="qty-col">Quantity</th>
+                    <th class="price-col">Unit price</th>
+                    <th class="gst-col">GST rate</th>
+                    <th class="amount-col">Total price AUD</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in document.items %}
+                    <tr>
+                        <td class="desc-col">{{ item.description }}</td>
+                        <td class="qty-col">{{ item.quantity }}</td>
+                        <td class="price-col">{{ item.unit_price }}</td>
+                        <td class="gst-col">{{ item.gst_rate|floatformat:1 }}</td>
+                        <td class="amount-col">{{ item.amount }}</td>
+                    </tr>
+                {% endfor %}
+                {% with 10|subtract:document.items|length as empty_rows %}
+                    {% for i in "xxxxxxxxxx"|slice:":empty_rows" %}
+                        <tr class="empty-row">
+                            <td class="desc-col">&nbsp;</td>
+                            <td class="qty-col">0</td>
+                            <td class="price-col">&nbsp;</td>
+                            <td class="gst-col">0</td>
+                            <td class="amount-col">0</td>
+                        </tr>
+                    {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+        
+        <div class="totals-section">
+            <div class="totals-table">
+                <div class="totals-row">
+                    <span class="totals-label">Subtotal</span>
+                    <span class="totals-value">{{ document.subtotal }}</span>
+                </div>
+                <div class="totals-row">
+                    <span class="totals-label">Total GST</span>
+                    <span class="totals-value">{{ document.gst_total }}</span>
+                </div>
+            </div>
+            <div class="grand-total">
+                <span class="totals-label">TOTAL AUD</span>
+                <span class="totals-value">{{ document.grand_total }}</span><br>
+                <span style="font-size: 8pt; font-weight: normal;">(incl. GST)</span>
+            </div>
+        </div>
+        
+        <div class="due-date-section">
+            <span style="margin-right: 20px;">Due Date:</span> {{ document.due_date|date:"d M Y" }}
+        </div>
+        
+        <div class="notes-section">
+            <div class="notes-title">Additional notes</div>
+            <div>
+                <strong>EFT Details:</strong><br>
+                Name: MochaTech Pty Ltd<br>
+                Commonwealth Bank of Australia<br>
+                BSB: 066 128<br>
+                A/C: 1074 2417
+            </div>
+        </div>
+        
+    {% else %}
+        <!-- ESTIMATE LAYOUT -->
+        <div class="header-container" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div class="doc-title" style="margin: 0;">ESTIMATE</div>
+            <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
+        </div>
+        
+        <div class="info-container">
+            <div class="info-left">
+                <div class="info-box"><span class="info-label">Customer name</span> {{ document.customer_name }}</div>
+                <div class="info-box"><span class="info-label">Customer ABN</span> {{ document.customer_abn|default:"" }}</div>
+                <div class="info-box"><span class="info-label">Estimate number</span> {{ document.number }}</div>
+                <div class="info-box"><span class="info-label">Date</span> {{ document.date|date:"d/m/Y" }}</div>
+                <div class="info-box"><span class="info-label">Estimate valid until</span> {{ document.valid_until|date:"d/m/Y" }}</div>
+            </div>
+            <div class="info-right">
+                <div class="info-box">
+                    <strong>MochaTech Pty Ltd</strong>
+                </div>
+                <div class="info-box"><span class="info-label">ABN</span> {{ document.company_abn|default:"79 690 649 515" }}</div>
+                <div class="info-box"><span class="info-label">Email</span> projects@mochatech.com.au</div>
+                <div class="info-box"><span class="info-label">Phone</span> 0424055711</div>
+                <div class="info-box">
+                    <span class="info-label">Address</span><br>
+                    U7, 39 Edinburgh Road<br>
+                    WA, 6058.<br>
+                    Australia
+                </div>
+            </div>
+        </div>
+        
+        {% if document.summary %}
+            <div class="summary-section">
+                <div class="summary-title">SUMMARY OF CUSTOMER REQUIREMENTS</div>
+                {% for item in document.summary %}
+                    <div class="summary-item">{{ forloop.counter }}. {{ item }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="desc-col">DESCRIPTION</th>
+                    <th class="price-col">PRICE</th>
+                    <th class="qty-col">QUANTITY</th>
+                    <th class="gst-col">GST %</th>
+                    <th class="amount-col">AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in document.items %}
+                    <tr>
+                        <td class="desc-col">{{ item.description }}</td>
+                        <td class="price-col">{{ item.unit_price }}</td>
+                        <td class="qty-col">{{ item.quantity }}</td>
+                        <td class="gst-col">{{ item.gst_rate|floatformat:0 }}</td>
+                        <td class="amount-col">{{ item.amount }}</td>
+                    </tr>
+                {% endfor %}
+                {% with 10|subtract:document.items|length as empty_rows %}
+                    {% for i in "xxxxxxxxxx"|slice:":empty_rows" %}
+                        <tr class="empty-row">
+                            <td class="desc-col">&nbsp;</td>
+                            <td class="price-col">&nbsp;</td>
+                            <td class="qty-col">&nbsp;</td>
+                            <td class="gst-col">&nbsp;</td>
+                            <td class="amount-col">0</td>
+                        </tr>
+                    {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+        
+        <div class="totals-section">
+            <div class="grand-total">
+                <span class="totals-label">TOTAL</span>
+                <span class="totals-value">{{ document.grand_total }}</span>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <div class="notes-title">TERMS & CONDITIONS</div>
+            <div class="terms-box">
+                {{ document.terms_conditions.text|default:""|linebreaksbr }}
+            </div>
+            
+            <div class="payment-terms-title">PAYMENT TERMS:</div>
+            <div class="info-box">
+                {{ document.payment_terms.text|default:""|linebreaksbr }}
+            </div>
+        </div>
+    {% endif %}
+    </div>
+    
+</body>
+</html>

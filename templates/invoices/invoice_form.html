@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MochaTech - {% if is_edit %}Edit{% else %}Create{% endif %} Tax Invoice</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            max-width: 950px; 
+            margin: 20px auto;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        h1 { 
+            color: #2c3e50;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+        .messages {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        form { 
+            background: #fff; 
+            padding: 30px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            border-left: 4px solid #e74c3c;
+        }
+        .form-section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        label { 
+            display: block; 
+            margin-top: 12px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 14px;
+        }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .helptext {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .item { 
+            background: #fff;
+            border: 2px solid #e0e0e0; 
+            padding: 20px; 
+            margin: 15px 0;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .item:hover {
+            border-color: #e74c3c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        .item-number {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 16px;
+        }
+        .item-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        .item-grid > div {
+            display: flex;
+            flex-direction: column;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        button { 
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button[type="button"] {
+            background-color: #3498db;
+            color: white;
+        }
+        button[type="button"]:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .remove-btn {
+            background-color: #95a5a6 !important;
+            color: white;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        .remove-btn:hover {
+            background-color: #7f8c8d !important;
+        }
+        .add-item-btn {
+            margin: 20px 0;
+            width: 100%;
+            background-color: #3498db;
+            padding: 14px;
+            font-size: 16px;
+        }
+        .add-item-btn:hover {
+            background-color: #2980b9;
+        }
+        .actions { 
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        .btn-preview {
+            background-color: #9b59b6;
+            color: white;
+        }
+        .btn-preview:hover {
+            background-color: #8e44ad;
+        }
+        .btn-save {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .btn-save:hover {
+            background-color: #c0392b;
+        }
+        .btn-download {
+            background-color: #e67e22;
+            color: white;
+        }
+        .btn-download:hover {
+            background-color: #d35400;
+        }
+        input[type="number"] {
+            text-align: right;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'invoices_home' %}" class="back-link">🏠 Home</a> | <a href="{% url 'document_list' %}" class="back-link">📄 Documents</a>
+    <h1>🧾 {% if is_edit %}Edit{% else %}Create{% endif %} Tax Invoice</h1>
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form method="post" id="invoiceForm">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h2>👤 Customer Information</h2>
+            {{ form.customer_name.label_tag }}
+            {{ form.customer_name }}
+            {{ form.customer_name.errors }}
+            
+            {{ form.attention.label_tag }}
+            {{ form.attention }}
+            {{ form.attention.errors }}
+            
+            {{ form.customer_address.label_tag }}
+            {{ form.customer_address }}
+            {{ form.customer_address.errors }}
+            
+            {{ form.customer_abn.label_tag }}
+            {{ form.customer_abn }}
+            {{ form.customer_abn.errors }}
+            
+            {{ form.company_abn.label_tag }}
+            {{ form.company_abn }}
+            {{ form.company_abn.errors }}
+        </div>
+        
+        <div class="form-section">
+            <h2>📅 Invoice Details</h2>
+            {{ form.number.label_tag }}
+            {{ form.number }}
+            <span class="helptext">Leave blank to auto-generate (format: MO-YYYY-##)</span>
+            {{ form.number.errors }}
+            
+            {{ form.date.label_tag }}
+            {{ form.date }}
+            {{ form.date.errors }}
+            
+            {{ form.due_date.label_tag }}
+            {{ form.due_date }}
+            {{ form.due_date.errors }}
+            
+            {{ form.po_reference.label_tag }}
+            {{ form.po_reference }}
+            {{ form.po_reference.errors }}
+        </div>
+        
+        <div class="form-section">
+            <h2>📦 Line Items</h2>
+            <p class="helptext">Add items to your invoice. Each item includes description, quantity, unit price, and GST rate.</p>
+            <div id="items-container"></div>
+            <button type="button" class="add-item-btn" onclick="addItem()">+ Add New Item</button>
+        </div>
+        
+        <input type="hidden" name="item_count" id="item-count-input" value="0">
+        
+        <div class="actions">
+            <button type="submit" name="action" value="preview" class="btn-preview">👁️ Preview</button>
+            <button type="submit" name="action" value="save" class="btn-save">💾 Save</button>
+            <button type="submit" name="action" value="download" class="btn-download">📥 Download PDF</button>
+        </div>
+    </form>
+
+    <script>
+        let itemIndex = 0;
+        
+        function addItem(desc = '', qty = 1, price = 25.00, gst = 0.1) {
+            const container = document.getElementById('items-container');
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.dataset.index = itemIndex;
+            div.innerHTML = `
+                <div class="item-header">
+                    <span class="item-number">Item #${itemIndex + 1}</span>
+                    <button type="button" class="remove-btn" onclick="removeItem(this)">🗑️ Remove</button>
+                </div>
+                <div class="item-grid">
+                    <div class="full-width">
+                        <label>Description</label>
+                        <textarea name="item_${itemIndex}_description" rows="3" placeholder="Enter item description...">${desc}</textarea>
+                    </div>
+                    <div>
+                        <label>Quantity</label>
+                        <input type="number" name="item_${itemIndex}_quantity" value="${qty}" min="1" placeholder="Qty">
+                    </div>
+                    <div>
+                        <label>Unit Price ($)</label>
+                        <input type="number" step="0.01" name="item_${itemIndex}_unit_price" value="${price}" min="0" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label>GST Rate</label>
+                        <input type="number" step="0.1" name="item_${itemIndex}_gst_rate" value="${gst}" min="0" max="1" placeholder="0.1">
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            itemIndex++;
+            updateItemCount();
+            renumberItems();
+        }
+        
+        function removeItem(button) {
+            button.closest('.item').remove();
+            updateItemCount();
+            renumberItems();
+        }
+        
+        function updateItemCount() {
+            const count = document.querySelectorAll('.item').length;
+            document.getElementById('item-count-input').value = count;
+        }
+        
+        function renumberItems() {
+            const items = document.querySelectorAll('.item');
+            items.forEach((item, index) => {
+                const numberSpan = item.querySelector('.item-number');
+                if (numberSpan) {
+                    numberSpan.textContent = `Item #${index + 1}`;
+                }
+            });
+        }
+        
+        // Add default items or existing items
+        {% if existing_items %}
+            // Load existing items for editing
+            {% for item in existing_items %}
+                addItem(
+                    '{{ item.description|escapejs }}',
+                    {{ item.quantity|default:1 }},
+                    {{ item.unit_price|default:25 }},
+                    {{ item.gst_rate|default:0.1 }}
+                );
+            {% endfor %}
+        {% else %}
+            // Add default items for new invoice
+            addItem('Drafting of As Built drawings – [21] drawings at [3] hours each', 63, 25, 0.1);
+            addItem('Drafting of As Built [2] drawings', 10, 25, 0.1);
+        {% endif %}
+        
+        document.getElementById('invoiceForm').addEventListener('submit', function() {
+            updateItemCount();
+        });
+    </script>
+</body>
+</html>

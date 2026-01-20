@@ -1,0 +1,380 @@
+{% load static invoice_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Estimate {{ estimate.number }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        
+        @page {
+            size: A4;
+            margin: 8mm;
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+            font-size: 8.5pt; 
+            margin: 0;
+            padding: 0;
+            color: #000;
+            line-height: 1.3;
+        }
+        /* A4 page container for screen view */
+        @media screen {
+            body {
+                background-color: #e0e0e0;
+                padding: 20px;
+            }
+            .page-container {
+                max-width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                padding: 8mm;
+            }
+        }
+        @media print {
+            .page-container {
+                max-width: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+        /* Screen-only elements (hidden in PDF) */
+        @media screen {
+            .screen-only {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+            }
+            .download-btn {
+                background-color: #6d4c41;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            }
+            .download-btn:hover {
+                background-color: #5d4037;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+            .back-btn {
+                background-color: #8d6e63;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                margin-right: 10px;
+                transition: all 0.3s ease;
+            }
+            .back-btn:hover {
+                background-color: #795548;
+                transform: translateY(-2px);
+            }
+        }
+        @media print {
+            .screen-only {
+                display: none !important;
+            }
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .company-logo {
+            height: 60px;
+            max-width: 180px;
+            object-fit: contain;
+        }
+        .doc-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16pt;
+            font-weight: 600;
+            margin: 10px 0 15px 0;
+            color: #4e342e;
+            letter-spacing: 1px;
+        }
+        .info-container {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .info-left, .info-right {
+            display: table-cell;
+            vertical-align: top;
+            width: 50%;
+        }
+        .info-right {
+            text-align: left;
+            padding-left: 15px;
+        }
+        .info-box {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            padding: 3px 6px;
+            margin: 1px 0;
+            font-size: 8.5pt;
+        }
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 80px;
+            color: #555;
+        }
+        .summary-section {
+            margin: 12px 0;
+            padding: 6px;
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+        }
+        .summary-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 9pt;
+            color: #4e342e;
+        }
+        .summary-item {
+            background-color: #ffffff;
+            padding: 8px;
+            margin: 3px 0;
+            border: 1px solid #bcaaa4;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+        table thead {
+            background-color: transparent;
+            border-bottom: 2px solid #6d4c41;
+        }
+        th {
+            padding: 5px 4px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #e0e0e0;
+            font-size: 8.5pt;
+        }
+        td {
+            padding: 4px 4px;
+            border: 1px solid #e0e0e0;
+            vertical-align: top;
+            font-size: 8.5pt;
+        }
+        .desc-col { width: 45%; }
+        .price-col { width: 15%; text-align: right; }
+        .qty-col { width: 10%; text-align: center; }
+        .gst-col { width: 10%; text-align: center; }
+        .amount-col { width: 20%; text-align: right; }
+        .empty-row td {
+            background-color: #f5f5f5;
+            height: 14px;
+            border: 1px solid #e0e0e0;
+        }
+        .totals-section {
+            margin: 12px 0;
+            text-align: right;
+        }
+        .grand-total {
+            background-color: #f5f5f5;
+            border: 2px solid #333;
+            padding: 6px 8px;
+            margin-top: 4px;
+            font-size: 10pt;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 220px;
+            text-align: right;
+            color: #2c3e50;
+        }
+        .totals-label {
+            display: inline-block;
+            min-width: 100px;
+            text-align: right;
+            padding-right: 15px;
+        }
+        .totals-value {
+            display: inline-block;
+            min-width: 80px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .terms-section {
+            margin: 12px 0;
+            padding: 6px;
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+        }
+        .terms-box {
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #333;
+        }
+        .payment-terms-title {
+            font-weight: bold;
+            margin: 10px 0 4px 0;
+            font-size: 9pt;
+        }
+            background-color: #d7ccc8;
+            padding: 8px 10px;
+            margin-top: 5px;
+            font-size: 11pt;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 250px;
+            text-align: right;
+        }
+        .totals-label {
+            display: inline-block;
+            min-width: 120px;
+            text-align: right;
+            padding-right: 20px;
+        }
+        .totals-value {
+            display: inline-block;
+            min-width: 100px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .terms-section {
+            margin-top: 30px;
+        }
+        .terms-box {
+            border: 1px solid #a1887f;
+            background-color: #ffffff;
+            min-height: 80px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .payment-terms-title {
+            font-weight: bold;
+            margin: 15px 0 5px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="screen-only">
+        <a href="{% url 'invoices_home' %}" class="back-btn" style="background-color: #5d4037;">🏠 Home</a>
+        <a href="{% url 'create_estimate' %}" class="back-btn">← Back to Form</a>
+        <form method="post" action="{% url 'save_estimate_from_preview' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="download-btn" style="background-color: #8d6e63; margin-right: 10px;">💾 Save</button>
+        </form>
+        <a href="{% url 'export_estimate_pdf' %}" class="download-btn">📥 Download PDF</a>
+    </div>
+    <div class="page-container">
+    <div class="header-container">
+        <div class="doc-title">ESTIMATE</div>
+        <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
+    </div>
+    
+    <div class="info-container">
+        <div class="info-left">
+            <div class="info-box"><span class="info-label">Customer name</span> {{ estimate.customer_name }}</div>
+            <div class="info-box"><span class="info-label">Customer ABN</span> {{ estimate.customer_abn|default:"-" }}</div>
+            <div class="info-box"><span class="info-label">Estimate number</span> {{ estimate.number }}</div>
+            <div class="info-box"><span class="info-label">Date</span> {{ estimate.date|date:"d/m/Y" }}</div>
+            <div class="info-box"><span class="info-label">Estimate valid until</span> {{ estimate.valid_until|date:"d/m/Y" }}</div>
+        </div>
+        <div class="info-right">
+            <div class="info-box" style="font-weight: bold; font-size: 9pt;">MochaTech Pty Ltd</div>
+            <div class="info-box"><span class="info-label">ABN</span> {{ estimate.company_abn|default:"79 690 649 515" }}</div>
+            <div class="info-box"><span class="info-label">Email</span> projects@mochatech.com.au</div>
+            <div class="info-box"><span class="info-label">Phone</span> 0424055711</div>
+            <div class="info-box">
+                <span class="info-label">Address</span><br>
+                U7, 39 Edinburgh Road<br>
+                WA, 6058.<br>
+                Australia
+            </div>
+        </div>
+    </div>
+    
+    {% if estimate.summary %}
+        <div class="summary-section">
+            <div class="summary-title">SUMMARY OF CUSTOMER REQUIREMENTS</div>
+            <div class="summary-item">
+                {{ estimate.summary|safe }}
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- LINE ITEMS TABLE: This displays all the items you added in the form -->
+    <!-- Each row shows: Description | Price | Quantity | GST % | Calculated Amount -->
+    <table>
+        <thead>
+            <tr>
+                <th class="desc-col">DESCRIPTION</th>
+                <th class="price-col">PRICE</th>
+                <th class="qty-col">QUANTITY</th>
+                <th class="gst-col">GST %</th>
+                <th class="amount-col">AMOUNT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in estimate.items %}
+                <tr>
+                    <td class="desc-col">{{ item.description }}</td>
+                    <td class="price-col">{{ item.unit_price }}</td>
+                    <td class="qty-col">{{ item.quantity }}</td>
+                    <td class="gst-col">{{ item.gst_rate|floatformat:0 }}</td>
+                    <td class="amount-col">{{ item.line_total_inc_gst|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+            {% with 10|subtract:estimate.items|length as empty_rows %}
+                {% for i in "xxxxxxxxxx"|slice:":empty_rows" %}
+                    <tr class="empty-row">
+                        <td class="desc-col">&nbsp;</td>
+                        <td class="price-col">&nbsp;</td>
+                        <td class="qty-col">&nbsp;</td>
+                        <td class="gst-col">&nbsp;</td>
+                        <td class="amount-col">0</td>
+                    </tr>
+                {% endfor %}
+            {% endwith %}
+        </tbody>
+    </table>
+    
+    <div class="totals-section">
+        <div class="grand-total">
+            <span class="totals-label">TOTAL</span>
+            <span class="totals-value">{{ estimate.grand_total|floatformat:2 }}</span>
+        </div>
+    </div>
+    
+    <div class="terms-section">
+        <div class="summary-title">TERMS & CONDITIONS</div>
+        <div class="terms-box">
+            {{ estimate.terms_conditions|safe }}
+        </div>
+        
+        <div class="payment-terms-title">PAYMENT TERMS:</div>
+        <div class="info-box">
+            {{ estimate.payment_terms|safe }}
+        </div>
+    </div>
+    
+    </div>
+    
+
+</body>
+</html>

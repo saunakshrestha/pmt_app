@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MochaTech - Invoice & Estimate System</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        .card-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .card p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .card-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .estimate-btn {
+            background-color: #27ae60;
+        }
+        .estimate-btn:hover {
+            background-color: #229954;
+        }
+        .invoice-btn {
+            background-color: #e74c3c;
+        }
+        .invoice-btn:hover {
+            background-color: #c0392b;
+        }
+        .footer-links {
+            text-align: center;
+        }
+        .footer-links a {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+        .footer-links a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 MochaTech Invoice System</h1>
+            <p>Professional Invoicing & Estimation Made Easy</p>
+        </div>
+        
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h2>Create Estimate</h2>
+                <p>Generate professional estimates with customer requirements, itemized pricing, and terms & conditions.</p>
+                <a href="/invoices/estimate/create/" class="card-btn estimate-btn">New Estimate</a>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">🧾</div>
+                <h2>Create Tax Invoice</h2>
+                <p>Create detailed tax invoices with GST calculations, customer details, and payment information.</p>
+                <a href="/invoices/invoice/create/" class="card-btn invoice-btn">New Invoice</a>
+            </div>
+        </div>
+        
+        <div class="footer-links">
+            <a href="/invoices/list/">📋 View All Documents</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!-- Breadcrumb Navigation Component -->
+<style>
+    .breadcrumb-container {
+        background: #f8f9fa;
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+    
+    .breadcrumb a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+    
+    .breadcrumb-separator {
+        color: #adb5bd;
+    }
+    
+    .breadcrumb-current {
+        color: #495057;
+        font-weight: 600;
+    }
+    
+    .home-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .home-link:hover {
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+</style>
+
+<div class="breadcrumb-container">
+    <nav class="breadcrumb">
+        <a href="{% url 'invoices_home' %}" class="home-link">🏠 Portal Home</a>
+        <span class="breadcrumb-separator">›</span>
+        {% block breadcrumb %}
+        <span class="breadcrumb-current">Current Page</span>
+        {% endblock %}
+    </nav>
+</div>
