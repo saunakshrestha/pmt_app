@@ -21,6 +21,7 @@ from projects.views import home
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
+    path('tinymce/', include('tinymce.urls')),
     path("projects/", include("projects.urls")),
     path("accounts/", include("accounts.urls")),
     path("invoices/", include("invoices.urls"))

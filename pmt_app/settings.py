@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'corsheaders',
+    'tinymce',
     'accounts',
     'projects',
     'realtime',
@@ -211,4 +212,15 @@ LOGGING = {
         'handlers': ['console'],
         'level': 'WARNING',
     },
+}
+
+# TinyMCE Configuration
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 300,
+    "menubar": False,
+    "plugins": "lists link code",
+    "toolbar": "undo redo | bold italic underline | numlist bullist | removeformat",
+    "content_style": "body { font-family: Arial, sans-serif; font-size: 14px; }",
+    "branding": False,
+    "promotion": False,
 }

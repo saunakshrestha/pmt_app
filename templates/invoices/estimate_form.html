@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MochaTech - Create Document</title>
+    <title>MochaTech - Create Estimate</title>
+    {{ form.media }}
     <style>
         * { box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
-            max-width: 900px; 
+            max-width: 950px; 
             margin: 20px auto;
             background-color: #f5f5f5;
             padding: 20px;
         }
         h1 { 
             color: #2c3e50;
-            border-bottom: 3px solid #3498db;
+            border-bottom: 3px solid #27ae60;
             padding-bottom: 10px;
         }
         .messages {
@@ -24,11 +25,6 @@
             padding: 12px;
             border-radius: 4px;
             margin-bottom: 20px;
-        }
-        .error-message {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
         }
         form { 
             background: #fff; 
@@ -41,7 +37,7 @@
             padding: 20px;
             margin: 20px 0;
             border-radius: 6px;
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #27ae60;
         }
         .form-section h2 {
             margin-top: 0;
@@ -67,12 +63,19 @@
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
         }
         textarea {
             min-height: 80px;
             resize: vertical;
+        }
+        .helptext {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            font-style: italic;
         }
         .item { 
             background: #fff;
@@ -80,11 +83,10 @@
             padding: 20px; 
             margin: 15px 0;
             border-radius: 6px;
-            position: relative;
             transition: all 0.3s ease;
         }
         .item:hover {
-            border-color: #3498db;
+            border-color: #27ae60;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .item-header {
@@ -97,7 +99,7 @@
         }
         .item-number {
             font-weight: bold;
-            color: #3498db;
+            color: #27ae60;
             font-size: 16px;
         }
         .item-grid {
@@ -128,7 +130,6 @@
         button[type="button"]:hover {
             background-color: #2980b9;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .remove-btn {
             background-color: #e74c3c !important;
@@ -171,49 +172,91 @@
         .btn-save:hover {
             background-color: #138d75;
         }
-        .helptext {
-            font-size: 12px;
-            color: #7f8c8d;
-            margin-top: 5px;
-            font-style: italic;
+        .btn-download {
+            background-color: #e67e22;
+            color: white;
+        }
+        .btn-download:hover {
+            background-color: #d35400;
         }
         input[type="number"] {
             text-align: right;
         }
-        #item-count-input {
-            display: none;
-        }
     </style>
 </head>
 <body>
-    <h1>📄 Create Estimate or Tax Invoice</h1>
+    <h1>📊 Create Estimate</h1>
     {% if messages %}
-        <div class="messages{% if 'error' in message.tags %} error-message{% endif %}">
+        <div class="messages">
             {% for message in messages %}
                 <p>{{ message }}</p>
             {% endfor %}
         </div>
     {% endif %}
-    <form method="post" id="documentForm">
+    <form method="post" id="estimateForm">
         {% csrf_token %}
         
         <div class="form-section">
-            <h2>📋 Document Information</h2>
-            {{ form.as_p }}
+            <h2>📋 Customer Information</h2>
+            {{ form.customer_name.label_tag }}
+            {{ form.customer_name }}
+            {{ form.customer_name.errors }}
+            
+            {{ form.customer_abn.label_tag }}
+            {{ form.customer_abn }}
+            {{ form.customer_abn.errors }}
+        </div>
+        
+        <div class="form-section">
+            <h2>📅 Estimate Details</h2>
+            {{ form.number.label_tag }}
+            {{ form.number }}
+            <span class="helptext">Leave blank to auto-generate</span>
+            {{ form.number.errors }}
+            
+            {{ form.date.label_tag }}
+            {{ form.date }}
+            {{ form.date.errors }}
+            
+            {{ form.valid_until.label_tag }}
+            {{ form.valid_until }}
+            {{ form.valid_until.errors }}
+        </div>
+        
+        <div class="form-section">
+            <h2>📝 Summary of Customer Requirements</h2>
+            {{ form.summary.label_tag }}
+            {{ form.summary }}
+            <span class="helptext">Use the editor to format your text. Use numbered lists for requirements.</span>
+            {{ form.summary.errors }}
         </div>
         
         <div class="form-section">
             <h2>📦 Line Items</h2>
-            <p class="helptext">Add items to your document. Each item includes description, quantity, unit price, and GST rate.</p>
+            <p class="helptext">Add items to your estimate. These will appear in the table with Description, Price, Quantity, GST %, and calculated Amount columns.</p>
             <div id="items-container"></div>
             <button type="button" class="add-item-btn" onclick="addItem()">+ Add New Item</button>
+        </div>
+        
+        <div class="form-section">
+            <h2>📄 Terms & Conditions</h2>
+            {{ form.terms_conditions.label_tag }}
+            {{ form.terms_conditions }}
+            <span class="helptext">{{ form.terms_conditions.help_text }}</span>
+            {{ form.terms_conditions.errors }}
+            
+            {{ form.payment_terms.label_tag }}
+            {{ form.payment_terms }}
+            <span class="helptext">{{ form.payment_terms.help_text }}</span>
+            {{ form.payment_terms.errors }}
         </div>
         
         <input type="hidden" name="item_count" id="item-count-input" value="0">
         
         <div class="actions">
-            <button type="submit" name="action" value="preview" class="btn-preview">👁️ Preview and Export PDF</button>
-            <button type="submit" name="action" value="save" class="btn-save">💾 Save and Preview</button>
+            <button type="submit" name="action" value="preview" class="btn-preview">👁️ Preview</button>
+            <button type="submit" name="action" value="save" class="btn-save">💾 Save</button>
+            <button type="submit" name="action" value="download" class="btn-download">📥 Download PDF</button>
         </div>
     </form>
 
@@ -236,15 +279,15 @@
                         <textarea name="item_${itemIndex}_description" rows="3" placeholder="Enter item description...">${desc}</textarea>
                     </div>
                     <div>
+                        <label>Price ($)</label>
+                        <input type="number" step="0.01" name="item_${itemIndex}_unit_price" value="${price}" min="0" placeholder="0.00">
+                    </div>
+                    <div>
                         <label>Quantity</label>
                         <input type="number" name="item_${itemIndex}_quantity" value="${qty}" min="1" placeholder="Qty">
                     </div>
                     <div>
-                        <label>Unit Price ($)</label>
-                        <input type="number" step="0.01" name="item_${itemIndex}_unit_price" value="${price}" min="0" placeholder="0.00">
-                    </div>
-                    <div>
-                        <label>GST Rate (%)</label>
+                        <label>GST %</label>
                         <input type="number" step="0.01" name="item_${itemIndex}_gst_rate" value="${gst}" min="0" max="100" placeholder="10.00">
                     </div>
                 </div>
@@ -276,12 +319,11 @@
             });
         }
         
-        // Add default items from the sample documents
+        // Add default items
         addItem('Drafting of As Built [21] drawings–Average 3hrs Each', 63, 25.00, 10.00);
         addItem('Drafting of As Built [2] drawings–Total 10hrs', 10, 25.00, 10.00);
         
-        // Update item count before form submission
-        document.getElementById('documentForm').addEventListener('submit', function() {
+        document.getElementById('estimateForm').addEventListener('submit', function() {
             updateItemCount();
         });
     </script>

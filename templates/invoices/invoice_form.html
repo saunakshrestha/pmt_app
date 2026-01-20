@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MochaTech - Create Document</title>
+    <title>MochaTech - Create Tax Invoice</title>
     <style>
         * { box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
-            max-width: 900px; 
+            max-width: 950px; 
             margin: 20px auto;
             background-color: #f5f5f5;
             padding: 20px;
         }
         h1 { 
             color: #2c3e50;
-            border-bottom: 3px solid #3498db;
+            border-bottom: 3px solid #e74c3c;
             padding-bottom: 10px;
         }
         .messages {
@@ -41,7 +41,7 @@
             padding: 20px;
             margin: 20px 0;
             border-radius: 6px;
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #e74c3c;
         }
         .form-section h2 {
             margin-top: 0;
@@ -67,12 +67,19 @@
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
         }
         textarea {
             min-height: 80px;
             resize: vertical;
+        }
+        .helptext {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            font-style: italic;
         }
         .item { 
             background: #fff;
@@ -80,11 +87,10 @@
             padding: 20px; 
             margin: 15px 0;
             border-radius: 6px;
-            position: relative;
             transition: all 0.3s ease;
         }
         .item:hover {
-            border-color: #3498db;
+            border-color: #e74c3c;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .item-header {
@@ -97,7 +103,7 @@
         }
         .item-number {
             font-weight: bold;
-            color: #3498db;
+            color: #e74c3c;
             font-size: 16px;
         }
         .item-grid {
@@ -128,26 +134,25 @@
         button[type="button"]:hover {
             background-color: #2980b9;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .remove-btn {
-            background-color: #e74c3c !important;
+            background-color: #95a5a6 !important;
             color: white;
             padding: 8px 16px;
             font-size: 12px;
         }
         .remove-btn:hover {
-            background-color: #c0392b !important;
+            background-color: #7f8c8d !important;
         }
         .add-item-btn {
             margin: 20px 0;
             width: 100%;
-            background-color: #27ae60;
+            background-color: #3498db;
             padding: 14px;
             font-size: 16px;
         }
         .add-item-btn:hover {
-            background-color: #229954;
+            background-color: #2980b9;
         }
         .actions { 
             margin-top: 30px;
@@ -165,46 +170,78 @@
             background-color: #8e44ad;
         }
         .btn-save {
-            background-color: #16a085;
+            background-color: #e74c3c;
             color: white;
         }
         .btn-save:hover {
-            background-color: #138d75;
+            background-color: #c0392b;
         }
-        .helptext {
-            font-size: 12px;
-            color: #7f8c8d;
-            margin-top: 5px;
-            font-style: italic;
+        .btn-download {
+            background-color: #e67e22;
+            color: white;
+        }
+        .btn-download:hover {
+            background-color: #d35400;
         }
         input[type="number"] {
             text-align: right;
         }
-        #item-count-input {
-            display: none;
-        }
     </style>
 </head>
 <body>
-    <h1>📄 Create Estimate or Tax Invoice</h1>
+    <h1>🧾 Create Tax Invoice</h1>
     {% if messages %}
-        <div class="messages{% if 'error' in message.tags %} error-message{% endif %}">
+        <div class="messages">
             {% for message in messages %}
                 <p>{{ message }}</p>
             {% endfor %}
         </div>
     {% endif %}
-    <form method="post" id="documentForm">
+    <form method="post" id="invoiceForm">
         {% csrf_token %}
         
         <div class="form-section">
-            <h2>📋 Document Information</h2>
-            {{ form.as_p }}
+            <h2>👤 Customer Information</h2>
+            {{ form.customer_name.label_tag }}
+            {{ form.customer_name }}
+            {{ form.customer_name.errors }}
+            
+            {{ form.attention.label_tag }}
+            {{ form.attention }}
+            {{ form.attention.errors }}
+            
+            {{ form.customer_address.label_tag }}
+            {{ form.customer_address }}
+            {{ form.customer_address.errors }}
+            
+            {{ form.customer_abn.label_tag }}
+            {{ form.customer_abn }}
+            {{ form.customer_abn.errors }}
+        </div>
+        
+        <div class="form-section">
+            <h2>📅 Invoice Details</h2>
+            {{ form.number.label_tag }}
+            {{ form.number }}
+            <span class="helptext">Leave blank to auto-generate (format: MO-YYYY-##)</span>
+            {{ form.number.errors }}
+            
+            {{ form.date.label_tag }}
+            {{ form.date }}
+            {{ form.date.errors }}
+            
+            {{ form.due_date.label_tag }}
+            {{ form.due_date }}
+            {{ form.due_date.errors }}
+            
+            {{ form.po_reference.label_tag }}
+            {{ form.po_reference }}
+            {{ form.po_reference.errors }}
         </div>
         
         <div class="form-section">
             <h2>📦 Line Items</h2>
-            <p class="helptext">Add items to your document. Each item includes description, quantity, unit price, and GST rate.</p>
+            <p class="helptext">Add items to your invoice. Each item includes description, quantity, unit price, and GST rate.</p>
             <div id="items-container"></div>
             <button type="button" class="add-item-btn" onclick="addItem()">+ Add New Item</button>
         </div>
@@ -212,15 +249,16 @@
         <input type="hidden" name="item_count" id="item-count-input" value="0">
         
         <div class="actions">
-            <button type="submit" name="action" value="preview" class="btn-preview">👁️ Preview and Export PDF</button>
-            <button type="submit" name="action" value="save" class="btn-save">💾 Save and Preview</button>
+            <button type="submit" name="action" value="preview" class="btn-preview">👁️ Preview</button>
+            <button type="submit" name="action" value="save" class="btn-save">💾 Save</button>
+            <button type="submit" name="action" value="download" class="btn-download">📥 Download PDF</button>
         </div>
     </form>
 
     <script>
         let itemIndex = 0;
         
-        function addItem(desc = '', qty = 1, price = 25.00, gst = 10.00) {
+        function addItem(desc = '', qty = 1, price = 25.00, gst = 0.1) {
             const container = document.getElementById('items-container');
             const div = document.createElement('div');
             div.className = 'item';
@@ -244,8 +282,8 @@
                         <input type="number" step="0.01" name="item_${itemIndex}_unit_price" value="${price}" min="0" placeholder="0.00">
                     </div>
                     <div>
-                        <label>GST Rate (%)</label>
-                        <input type="number" step="0.01" name="item_${itemIndex}_gst_rate" value="${gst}" min="0" max="100" placeholder="10.00">
+                        <label>GST Rate</label>
+                        <input type="number" step="0.1" name="item_${itemIndex}_gst_rate" value="${gst}" min="0" max="1" placeholder="0.1">
                     </div>
                 </div>
             `;
@@ -276,12 +314,11 @@
             });
         }
         
-        // Add default items from the sample documents
-        addItem('Drafting of As Built [21] drawings–Average 3hrs Each', 63, 25.00, 10.00);
-        addItem('Drafting of As Built [2] drawings–Total 10hrs', 10, 25.00, 10.00);
+        // Add default items
+        addItem('Drafting of As Built drawings – [21] drawings at [3] hours each', 63, 25, 0.1);
+        addItem('Drafting of As Built [2] drawings', 10, 25, 0.1);
         
-        // Update item count before form submission
-        document.getElementById('documentForm').addEventListener('submit', function() {
+        document.getElementById('invoiceForm').addEventListener('submit', function() {
             updateItemCount();
         });
     </script>
