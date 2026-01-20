@@ -252,7 +252,7 @@
                     <div class="highlight-box"><strong>Reference/PO #</strong></div>
                     <div class="info-box">{{ invoice.po_reference|default:"-" }}</div>
                     <div class="info-box" style="margin-top: 5px;"><strong>ABN</strong></div>
-                    <div class="info-box">79 690 649 515</div>
+                    <div class="info-box">{{ invoice.company_abn|default:"79 690 649 515" }}</div>
                 </div>
                 
                 <!-- Company Details Column -->

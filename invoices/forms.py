@@ -15,7 +15,7 @@ class EstimateForm(forms.ModelForm):
     class Meta:
         model = Estimate
         fields = [
-            "customer_name", "customer_abn", "number", "date", "valid_until",
+            "customer_name", "customer_abn", "company_abn", "number", "date", "valid_until",
             "summary", "terms_conditions", "payment_terms"
         ]
         widgets = {
@@ -23,6 +23,7 @@ class EstimateForm(forms.ModelForm):
             "valid_until": forms.DateInput(attrs={"type": "date"}),
             "customer_name": forms.TextInput(attrs={"placeholder": "e.g., IPS Design"}),
             "customer_abn": forms.TextInput(attrs={"placeholder": "e.g., 12 345 678 901"}),
+            "company_abn": forms.TextInput(attrs={"placeholder": "e.g., 79 690 649 515"}),
             "number": forms.TextInput(attrs={"placeholder": "Auto-generated if left blank"}),
             "summary": TinyMCE(attrs={
                 "placeholder": "Enter summary of customer requirements. You can use basic HTML formatting."
@@ -37,6 +38,7 @@ class EstimateForm(forms.ModelForm):
         labels = {
             "customer_name": "Customer Name",
             "customer_abn": "Customer ABN",
+            "company_abn": "Company ABN (Our ABN)",
             "number": "Estimate Number (optional)",
             "date": "Date",
             "valid_until": "Estimate Valid Until",
@@ -63,7 +65,7 @@ class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
         fields = [
-            "customer_name", "attention", "customer_address", "customer_abn",
+            "customer_name", "attention", "customer_address", "customer_abn", "company_abn",
             "number", "date", "due_date", "po_reference"
         ]
         widgets = {
@@ -73,6 +75,7 @@ class InvoiceForm(forms.ModelForm):
             "attention": forms.TextInput(attrs={"placeholder": "e.g., Ryan Shackleton"}),
             "customer_address": forms.Textarea(attrs={"rows": 3, "placeholder": "PO BOX 2046 MARMION WA 6020\nAUSTRALIA"}),
             "customer_abn": forms.TextInput(attrs={"placeholder": "e.g., 67 667 059 458"}),
+            "company_abn": forms.TextInput(attrs={"placeholder": "e.g., 79 690 649 515"}),
             "number": forms.TextInput(attrs={"placeholder": "Auto-generated if left blank"}),
             "po_reference": forms.TextInput(attrs={"placeholder": "e.g., PO-0015"}),
         }
@@ -80,7 +83,8 @@ class InvoiceForm(forms.ModelForm):
             "customer_name": "Customer Name",
             "attention": "Attention",
             "customer_address": "Customer Address",
-            "customer_abn": "ABN",
+            "customer_abn": "Customer ABN",
+            "company_abn": "Company ABN (Our ABN)",
             "number": "Invoice Number (optional)",
             "date": "Invoice Date",
             "due_date": "Due Date",

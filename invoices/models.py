@@ -11,6 +11,7 @@ class Estimate(models.Model):
     
     customer_name = models.CharField(max_length=150, blank=True)
     customer_abn = models.CharField(max_length=20, blank=True)
+    company_abn = models.CharField(max_length=20, default="79 690 649 515", blank=True)
     
     # Summary of customer requirements (HTML content)
     summary = models.TextField(blank=True, help_text="HTML formatted summary of customer requirements")
@@ -53,6 +54,7 @@ class Invoice(models.Model):
     customer_address = models.TextField(blank=True)
     attention = models.CharField(max_length=100, blank=True)
     po_reference = models.CharField(max_length=50, blank=True)
+    company_abn = models.CharField(max_length=20, default="79 690 649 515", blank=True)
     
     # Totals
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0, blank=True)

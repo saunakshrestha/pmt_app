@@ -78,6 +78,7 @@ def create_estimate(request, estimate_id=None):
             estimate_data = {
                 "customer_name": form.cleaned_data["customer_name"],
                 "customer_abn": form.cleaned_data["customer_abn"],
+                "company_abn": form.cleaned_data.get("company_abn", "79 690 649 515"),
                 "number": form.cleaned_data["number"] or "DRAFT",
                 "date": form.cleaned_data["date"].isoformat() if form.cleaned_data["date"] else None,
                 "valid_until": form.cleaned_data["valid_until"].isoformat() if form.cleaned_data["valid_until"] else None,
@@ -231,6 +232,7 @@ def save_estimate_from_preview(request):
     estimate = Estimate(
         customer_name=data["customer_name"],
         customer_abn=data["customer_abn"],
+        company_abn=data.get("company_abn", "79 690 649 515"),
         number=data["number"] if data["number"] != "DRAFT" else None,
         date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
         valid_until=date.fromisoformat(data["valid_until"]) if data.get("valid_until") and isinstance(data["valid_until"], str) else data.get("valid_until"),
@@ -338,6 +340,7 @@ def create_invoice(request, invoice_id=None):
                 "attention": form.cleaned_data["attention"],
                 "customer_address": form.cleaned_data["customer_address"],
                 "customer_abn": form.cleaned_data["customer_abn"],
+                "company_abn": form.cleaned_data.get("company_abn", "79 690 649 515"),
                 "number": form.cleaned_data["number"] or "DRAFT",
                 "date": form.cleaned_data["date"].isoformat() if form.cleaned_data["date"] else None,
                 "due_date": form.cleaned_data["due_date"].isoformat() if form.cleaned_data["due_date"] else None,
@@ -498,6 +501,7 @@ def save_invoice_from_preview(request):
         customer_address=data["customer_address"],
         attention=data["attention"],
         po_reference=data["po_reference"],
+        company_abn=data.get("company_abn", "79 690 649 515"),
         number=data["number"] if data["number"] != "DRAFT" else None,
         date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
         due_date=date.fromisoformat(data["due_date"]) if data.get("due_date") and isinstance(data["due_date"], str) else data.get("due_date"),
