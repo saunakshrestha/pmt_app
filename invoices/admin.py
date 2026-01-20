@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Estimate, EstimateItem, Invoice, InvoiceItem, Document, Item
+from .models import Estimate, EstimateItem, Invoice, InvoiceItem
 
 
 class EstimateItemInline(admin.TabularInline):
@@ -28,7 +28,3 @@ class InvoiceAdmin(admin.ModelAdmin):
     inlines = [InvoiceItemInline]
 
 
-# Register old models for backward compatibility
-@admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
-    list_display = ['number', 'doc_type', 'customer_name', 'date', 'grand_total']
