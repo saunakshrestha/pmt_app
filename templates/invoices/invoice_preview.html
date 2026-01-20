@@ -48,7 +48,7 @@
                 z-index: 1000;
             }
             .download-btn {
-                background-color: #27ae60;
+                background-color: #6d4c41;
                 color: white;
                 padding: 12px 24px;
                 border: none;
@@ -62,12 +62,12 @@
                 transition: all 0.3s ease;
             }
             .download-btn:hover {
-                background-color: #229954;
+                background-color: #5d4037;
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             }
             .back-btn {
-                background-color: #3498db;
+                background-color: #8d6e63;
                 color: white;
                 padding: 12px 24px;
                 border: none;
@@ -82,7 +82,7 @@
                 transition: all 0.3s ease;
             }
             .back-btn:hover {
-                background-color: #2980b9;
+                background-color: #795548;
                 transform: translateY(-2px);
             }
         }
@@ -92,8 +92,8 @@
             }
         }
         .company-header {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #495057;
+            background-color: transparent;
+            border-bottom: 2px solid #6d4c41;
             padding: 8px 10px;
             margin-bottom: 15px;
             font-size: 11pt;
@@ -142,8 +142,8 @@
             padding-left: 0;
         }
         .info-box {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
+            background-color: transparent;
+            border: 1px solid #e0e0e0;
             padding: 3px 6px;
             margin: 1px 0;
             font-size: 8.5pt;
@@ -154,13 +154,13 @@
             min-width: 80px;
         }
         .customer-box {
-            background-color: #fff3cd;
+            background-color: #ffffff;
             padding: 3px 6px;
             margin: 1px 0;
             font-weight: bold;
         }
         .highlight-box {
-            background-color: #fff3cd;
+            background-color: #ffffff;
             padding: 3px 6px;
             margin: 1px 0;
         }
@@ -170,19 +170,19 @@
             margin: 12px 0;
         }
         table thead {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #495057;
+            background-color: transparent;
+            border-bottom: 2px solid #6d4c41;
         }
         th {
             padding: 5px 4px;
             text-align: left;
             font-weight: bold;
-            border: 1px solid #a0a0a0;
+            border: 1px solid #e0e0e0;
             font-size: 8.5pt;
         }
         td {
             padding: 4px 4px;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #e0e0e0;
             vertical-align: top;
             font-size: 8.5pt;
         }
@@ -207,7 +207,7 @@
         }
         .totals-row {
             padding: 3px 0;
-            border-bottom: 1px solid #d0d0d0;
+            border-bottom: 1px solid #bcaaa4;
         }
         .totals-label {
             display: inline-block;
@@ -222,7 +222,7 @@
             font-weight: bold;
         }
         .grand-total {
-            background-color: #d4e6f1;
+            background-color: #d7ccc8;
             padding: 6px 8px;
             margin-top: 4px;
             font-size: 10pt;
@@ -231,15 +231,17 @@
         .due-date-section {
             margin: 15px 0;
             padding: 5px;
-            background-color: #fff3cd;
+            background-color: #ffffff;
             font-weight: bold;
+            border: 1px solid #bcaaa4;
         }
             font-weight: bold;
         }
         .notes-section {
             margin-top: 25px;
             padding: 15px;
-            background-color: #d4e6f1;
+            background-color: transparent;
+            border: 1px solid #e0e0e0;
         }
         .notes-title {
             font-weight: bold;
@@ -250,10 +252,11 @@
 </head>
 <body>
     <div class="screen-only">
+        <a href="{% url 'invoices_home' %}" class="back-btn" style="background-color: #5d4037;">🏠 Home</a>
         <a href="{% url 'create_invoice' %}" class="back-btn">← Back to Form</a>
         <form method="post" action="{% url 'save_invoice_from_preview' %}" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="download-btn" style="background-color: #16a085; margin-right: 10px;">💾 Save</button>
+            <button type="submit" class="download-btn" style="background-color: #8d6e63; margin-right: 10px;">💾 Save</button>
         </form>
         <a href="{% url 'export_invoice_pdf' %}" class="download-btn">📥 Download PDF</a>
     </div>

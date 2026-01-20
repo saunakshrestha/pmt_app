@@ -50,7 +50,7 @@
                 z-index: 1000;
             }
             .download-btn {
-                background-color: #27ae60;
+                background-color: #6d4c41;
                 color: white;
                 padding: 12px 24px;
                 border: none;
@@ -64,12 +64,12 @@
                 transition: all 0.3s ease;
             }
             .download-btn:hover {
-                background-color: #229954;
+                background-color: #5d4037;
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             }
             .back-btn {
-                background-color: #3498db;
+                background-color: #8d6e63;
                 color: white;
                 padding: 12px 24px;
                 border: none;
@@ -84,7 +84,7 @@
                 transition: all 0.3s ease;
             }
             .back-btn:hover {
-                background-color: #2980b9;
+                background-color: #795548;
                 transform: translateY(-2px);
             }
         }
@@ -109,7 +109,7 @@
             font-size: 16pt;
             font-weight: 600;
             margin: 10px 0 15px 0;
-            color: #2c3e50;
+            color: #4e342e;
             letter-spacing: 1px;
         }
         .info-container {
@@ -149,12 +149,13 @@
             font-weight: bold;
             margin-bottom: 6px;
             font-size: 9pt;
-            color: #2c3e50;
+            color: #4e342e;
         }
         .summary-item {
-            background-color: #fff3cd;
+            background-color: #ffffff;
             padding: 8px;
             margin: 3px 0;
+            border: 1px solid #bcaaa4;
         }
         table {
             width: 100%;
@@ -162,19 +163,19 @@
             margin: 12px 0;
         }
         table thead {
-            background-color: #f5f5f5;
-            border-bottom: 2px solid #333;
+            background-color: transparent;
+            border-bottom: 2px solid #6d4c41;
         }
         th {
             padding: 5px 4px;
             text-align: left;
             font-weight: bold;
-            border: 1px solid #a0a0a0;
+            border: 1px solid #e0e0e0;
             font-size: 8.5pt;
         }
         td {
             padding: 4px 4px;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #e0e0e0;
             vertical-align: top;
             font-size: 8.5pt;
         }
@@ -232,7 +233,7 @@
             margin: 10px 0 4px 0;
             font-size: 9pt;
         }
-            background-color: #d4e6f1;
+            background-color: #d7ccc8;
             padding: 8px 10px;
             margin-top: 5px;
             font-size: 11pt;
@@ -257,8 +258,8 @@
             margin-top: 30px;
         }
         .terms-box {
-            border: 1px solid #a0a0a0;
-            background-color: #fff3cd;
+            border: 1px solid #a1887f;
+            background-color: #ffffff;
             min-height: 80px;
             padding: 10px;
             margin: 10px 0;
@@ -272,10 +273,11 @@
 </head>
 <body>
     <div class="screen-only">
+        <a href="{% url 'invoices_home' %}" class="back-btn" style="background-color: #5d4037;">🏠 Home</a>
         <a href="{% url 'create_estimate' %}" class="back-btn">← Back to Form</a>
         <form method="post" action="{% url 'save_estimate_from_preview' %}" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="download-btn" style="background-color: #16a085; margin-right: 10px;">💾 Save</button>
+            <button type="submit" class="download-btn" style="background-color: #8d6e63; margin-right: 10px;">💾 Save</button>
         </form>
         <a href="{% url 'export_estimate_pdf' %}" class="download-btn">📥 Download PDF</a>
     </div>

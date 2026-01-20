@@ -199,7 +199,7 @@
     </style>
 </head>
 <body>
-    <a href="{% url 'document_list' %}" class="back-link">← Back to Documents</a>
+    <a href="{% url 'invoices_home' %}" class="back-link">🏠 Home</a> | <a href="{% url 'document_list' %}" class="back-link">📄 Documents</a>
     <h1>🧾 {% if is_edit %}Edit{% else %}Create{% endif %} Tax Invoice</h1>
     {% if messages %}
         <div class="messages">
