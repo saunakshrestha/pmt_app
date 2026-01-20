@@ -32,8 +32,15 @@ def invoices_home(request):
 
 
 # ESTIMATE VIEWS
-def create_estimate(request):
-    """Create a new estimate"""
+def create_estimate(request, estimate_id=None):
+    """Create a new estimate or edit existing one"""
+    estimate_instance = None
+    existing_items = []
+    
+    if estimate_id:
+        estimate_instance = Estimate.objects.get(id=estimate_id)
+        existing_items = EstimateItem.objects.filter(estimate=estimate_instance)
+    
     if request.method == "POST":
         form = EstimateForm(request.POST)
         if form.is_valid():
@@ -90,13 +97,23 @@ def create_estimate(request):
             
             elif action == "save":
                 # Save to database and show preview
-                estimate = form.save(commit=False)
-                if not estimate.number:
-                    max_num = Estimate.objects.aggregate(max_num=Max("number"))["max_num"]
-                    if max_num and max_num.isdigit():
-                        estimate.number = str(int(max_num) + 1)
-                    else:
-                        estimate.number = "2025001"
+                if estimate_instance:
+                    # Update existing estimate
+                    estimate = estimate_instance
+                    # Update fields from form
+                    for field in form.cleaned_data:
+                        setattr(estimate, field, form.cleaned_data[field])
+                    # Delete old items
+                    EstimateItem.objects.filter(estimate=estimate_instance).delete()
+                else:
+                    # Create new estimate
+                    estimate = form.save(commit=False)
+                    if not estimate.number:
+                        max_num = Estimate.objects.aggregate(max_num=Max("number"))["max_num"]
+                        if max_num and max_num.isdigit():
+                            estimate.number = str(int(max_num) + 1)
+                        else:
+                            estimate.number = "2025001"
                 
                 estimate.subtotal = subtotal
                 estimate.gst_total = gst_total
@@ -120,13 +137,23 @@ def create_estimate(request):
             
             elif action == "download":
                 # Save to database first, then download PDF
-                estimate = form.save(commit=False)
-                if not estimate.number:
-                    max_num = Estimate.objects.aggregate(max_num=Max("number"))["max_num"]
-                    if max_num and max_num.isdigit():
-                        estimate.number = str(int(max_num) + 1)
-                    else:
-                        estimate.number = "2025001"
+                if estimate_instance:
+                    # Update existing estimate
+                    estimate = estimate_instance
+                    # Update fields from form
+                    for field in form.cleaned_data:
+                        setattr(estimate, field, form.cleaned_data[field])
+                    # Delete old items
+                    EstimateItem.objects.filter(estimate=estimate_instance).delete()
+                else:
+                    # Create new estimate
+                    estimate = form.save(commit=False)
+                    if not estimate.number:
+                        max_num = Estimate.objects.aggregate(max_num=Max("number"))["max_num"]
+                        if max_num and max_num.isdigit():
+                            estimate.number = str(int(max_num) + 1)
+                        else:
+                            estimate.number = "2025001"
                 
                 estimate.subtotal = subtotal
                 estimate.gst_total = gst_total
@@ -152,9 +179,17 @@ def create_estimate(request):
             messages.error(request, "Form errors - please check fields.")
 
     else:
-        form = EstimateForm()
+        if estimate_instance:
+            # Pre-populate form with existing data
+            form = EstimateForm(instance=estimate_instance)
+        else:
+            form = EstimateForm()
 
-    return render(request, "invoices/estimate_form.html", {"form": form})
+    return render(request, "invoices/estimate_form.html", {
+        "form": form,
+        "existing_items": existing_items,
+        "is_edit": estimate_instance is not None,
+    })
 
 
 def preview_estimate(request):
@@ -251,8 +286,15 @@ def export_estimate_pdf(request):
 
 
 # INVOICE VIEWS
-def create_invoice(request):
-    """Create a new tax invoice"""
+def create_invoice(request, invoice_id=None):
+    """Create a new tax invoice or edit existing one"""
+    invoice_instance = None
+    existing_items = []
+    
+    if invoice_id:
+        invoice_instance = Invoice.objects.get(id=invoice_id)
+        existing_items = InvoiceItem.objects.filter(invoice=invoice_instance)
+    
     if request.method == "POST":
         form = InvoiceForm(request.POST)
         if form.is_valid():
@@ -309,16 +351,26 @@ def create_invoice(request):
             
             elif action == "save":
                 # Save to database and show preview
-                invoice = form.save(commit=False)
-                if not invoice.number:
-                    year = invoice.date.year if invoice.date else timezone.now().year
-                    max_seq = Invoice.objects.filter(number__startswith=f"MO-{year}-").aggregate(
-                        max_seq=Max("number"))["max_seq"]
-                    if max_seq:
-                        seq = int(max_seq.split("-")[-1]) + 1
-                    else:
-                        seq = 1
-                    invoice.number = f"MO-{year}-{seq:02d}"
+                if invoice_instance:
+                    # Update existing invoice
+                    invoice = invoice_instance
+                    # Update fields from form
+                    for field in form.cleaned_data:
+                        setattr(invoice, field, form.cleaned_data[field])
+                    # Delete old items
+                    InvoiceItem.objects.filter(invoice=invoice_instance).delete()
+                else:
+                    # Create new invoice
+                    invoice = form.save(commit=False)
+                    if not invoice.number:
+                        year = invoice.date.year if invoice.date else timezone.now().year
+                        max_seq = Invoice.objects.filter(number__startswith=f"MO-{year}-").aggregate(
+                            max_seq=Max("number"))["max_seq"]
+                        if max_seq:
+                            seq = int(max_seq.split("-")[-1]) + 1
+                        else:
+                            seq = 1
+                        invoice.number = f"MO-{year}-{seq:02d}"
                 
                 invoice.subtotal = subtotal
                 invoice.gst_total = gst_total
@@ -342,16 +394,26 @@ def create_invoice(request):
             
             elif action == "download":
                 # Save to database first, then download PDF
-                invoice = form.save(commit=False)
-                if not invoice.number:
-                    year = invoice.date.year if invoice.date else timezone.now().year
-                    max_seq = Invoice.objects.filter(number__startswith=f"MO-{year}-").aggregate(
-                        max_seq=Max("number"))["max_seq"]
-                    if max_seq:
-                        seq = int(max_seq.split("-")[-1]) + 1
-                    else:
-                        seq = 1
-                    invoice.number = f"MO-{year}-{seq:02d}"
+                if invoice_instance:
+                    # Update existing invoice
+                    invoice = invoice_instance
+                    # Update fields from form
+                    for field in form.cleaned_data:
+                        setattr(invoice, field, form.cleaned_data[field])
+                    # Delete old items
+                    InvoiceItem.objects.filter(invoice=invoice_instance).delete()
+                else:
+                    # Create new invoice
+                    invoice = form.save(commit=False)
+                    if not invoice.number:
+                        year = invoice.date.year if invoice.date else timezone.now().year
+                        max_seq = Invoice.objects.filter(number__startswith=f"MO-{year}-").aggregate(
+                            max_seq=Max("number"))["max_seq"]
+                        if max_seq:
+                            seq = int(max_seq.split("-")[-1]) + 1
+                        else:
+                            seq = 1
+                        invoice.number = f"MO-{year}-{seq:02d}"
                 
                 invoice.subtotal = subtotal
                 invoice.gst_total = gst_total
@@ -377,9 +439,17 @@ def create_invoice(request):
             messages.error(request, "Form errors - please check fields.")
 
     else:
-        form = InvoiceForm()
+        if invoice_instance:
+            # Pre-populate form with existing data
+            form = InvoiceForm(instance=invoice_instance)
+        else:
+            form = InvoiceForm()
 
-    return render(request, "invoices/invoice_form.html", {"form": form})
+    return render(request, "invoices/invoice_form.html", {
+        "form": form,
+        "existing_items": existing_items,
+        "is_edit": invoice_instance is not None,
+    })
 
 
 def preview_invoice(request):
@@ -480,12 +550,39 @@ def export_invoice_pdf(request):
 
 # LIST VIEW
 def document_list(request):
-    """List all invoices and estimates"""
-    invoices = Invoice.objects.all()
-    estimates = Estimate.objects.all()
-    return render(request, "invoices/list.html", {
-        "invoices": invoices,
-        "estimates": estimates
+    """List all invoices and estimates with cards"""
+    invoices = Invoice.objects.all().order_by('-created_at')
+    estimates = Estimate.objects.all().order_by('-created_at')
+    
+    # Combine into a single list with document type
+    documents = []
+    for inv in invoices:
+        documents.append({
+            'type': 'invoice',
+            'id': inv.id,
+            'number': inv.number,
+            'customer_name': inv.customer_name,
+            'date': inv.date,
+            'total': inv.grand_total,
+            'created_at': inv.created_at,
+        })
+    
+    for est in estimates:
+        documents.append({
+            'type': 'estimate',
+            'id': est.id,
+            'number': est.number,
+            'customer_name': est.customer_name,
+            'date': est.date,
+            'total': est.grand_total,
+            'created_at': est.created_at,
+        })
+    
+    # Sort by created_at descending
+    documents.sort(key=lambda x: x['created_at'], reverse=True)
+    
+    return render(request, "invoices/view_documents.html", {
+        "documents": documents
     })
 
 

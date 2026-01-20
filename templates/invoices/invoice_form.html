@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MochaTech - Create Tax Invoice</title>
+    <title>MochaTech - {% if is_edit %}Edit{% else %}Create{% endif %} Tax Invoice</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -186,10 +186,21 @@
         input[type="number"] {
             text-align: right;
         }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <h1>🧾 Create Tax Invoice</h1>
+    <a href="{% url 'document_list' %}" class="back-link">← Back to Documents</a>
+    <h1>🧾 {% if is_edit %}Edit{% else %}Create{% endif %} Tax Invoice</h1>
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -314,9 +325,22 @@
             });
         }
         
-        // Add default items
-        addItem('Drafting of As Built drawings – [21] drawings at [3] hours each', 63, 25, 0.1);
-        addItem('Drafting of As Built [2] drawings', 10, 25, 0.1);
+        // Add default items or existing items
+        {% if existing_items %}
+            // Load existing items for editing
+            {% for item in existing_items %}
+                addItem(
+                    '{{ item.description|escapejs }}',
+                    {{ item.quantity|default:1 }},
+                    {{ item.unit_price|default:25 }},
+                    {{ item.gst_rate|default:0.1 }}
+                );
+            {% endfor %}
+        {% else %}
+            // Add default items for new invoice
+            addItem('Drafting of As Built drawings – [21] drawings at [3] hours each', 63, 25, 0.1);
+            addItem('Drafting of As Built [2] drawings', 10, 25, 0.1);
+        {% endif %}
         
         document.getElementById('invoiceForm').addEventListener('submit', function() {
             updateItemCount();
