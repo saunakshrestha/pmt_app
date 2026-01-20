@@ -1,0 +1,5 @@
+<svg width="150" height="50" xmlns="http://www.w3.org/2000/svg">
+  <rect width="150" height="50" fill="#3498db" rx="5"/>
+  <text x="75" y="30" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">MochaTech</text>
+  <text x="75" y="42" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Pty Ltd</text>
+</svg>
