@@ -32,7 +32,7 @@ class CustomUserAdmin(BaseUserAdmin):
     readonly_fields = ('date_joined',)
 
     fieldsets = (
-        (None, {'fields': ('tenant', 'email', 'password')}),
+        (None, {'fields': ('tenant', 'email', 'username', 'password')}),
         (_('Personal Info'), {'fields': ('name',)}),
         (_('Permissions'), {
             'fields': (
@@ -49,6 +49,6 @@ class CustomUserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_superuser', 'is_active')}
+            'fields': ('email', 'username', 'name', 'password1', 'password2', 'tenant', 'is_staff', 'is_superuser', 'is_active')}
         ),
     )
