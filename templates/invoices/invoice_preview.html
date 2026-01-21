@@ -285,9 +285,7 @@
         <div class="info-column">
             <div class="section-title">From:</div>
             <div class="info-box" style="font-weight: bold; font-size: 9pt;">MochaTech Pty Ltd</div>
-            <div class="info-box">U7, 39 Edinburgh Road</div>
-            <div class="info-box">WA, 6058.</div>
-            <div class="info-box">Australia</div>
+            <div class="info-box">U7, 39 Edinburgh Road, WA, 6058, Australia</div>
             <div class="info-box" style="margin-top: 5px;"><strong>ABN:</strong> {{ invoice.company_abn|default:"79 690 649 515" }}</div>
         </div>
     </div>
@@ -297,9 +295,9 @@
             <tr>
                 <th class="desc-col">Description</th>
                 <th class="qty-col">Quantity</th>
-                <th class="price-col">Unit price</th>
+                <th class="price-col">Unit price ($)</th>
                 <th class="gst-col">GST rate (%)</th>
-                <th class="amount-col">Total price AUD</th>
+                <th class="amount-col">Total price (AUD $)</th>
             </tr>
         </thead>
         <tbody>
@@ -338,8 +336,8 @@
             </div>
         </div>
         <div class="grand-total">
-            <span class="totals-label">TOTAL AUD</span>
-            <span class="totals-value">{{ invoice.grand_total|floatformat:2 }}</span><br>
+            <span class="totals-label">TOTAL (AUD)</span>
+            <span class="totals-value">${{ invoice.grand_total|floatformat:2 }}</span><br>
             <span style="font-size: 8pt; font-weight: normal;">(incl. GST)</span>
         </div>
     </div>

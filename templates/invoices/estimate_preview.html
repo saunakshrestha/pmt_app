@@ -93,15 +93,20 @@
                 display: none !important;
             }
         }
-        .header-container {
+        .company-header {
+            background-color: transparent;
+            border-bottom: 2px solid #6d4c41;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 11pt;
+            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
         }
         .company-logo {
-            height: 60px;
-            max-width: 180px;
+            height: 50px;
+            max-width: 150px;
             object-fit: contain;
         }
         .doc-title {
@@ -282,10 +287,12 @@
         <a href="{% url 'export_estimate_pdf' %}" class="download-btn">📥 Download PDF</a>
     </div>
     <div class="page-container">
-    <div class="header-container">
-        <div class="doc-title">ESTIMATE</div>
+    <div class="company-header">
+        <span>MochaTech Pty Ltd</span>
         <img src="{% static 'images/company-logo.svg' %}" alt="Company Logo" class="company-logo">
     </div>
+    
+    <div class="doc-title">ESTIMATE</div>
     
     <div class="info-container">
         <div class="info-left">
@@ -301,10 +308,7 @@
             <div class="info-box"><span class="info-label">Email</span> projects@mochatech.com.au</div>
             <div class="info-box"><span class="info-label">Phone</span> 0424055711</div>
             <div class="info-box">
-                <span class="info-label">Address</span><br>
-                U7, 39 Edinburgh Road<br>
-                WA, 6058.<br>
-                Australia
+                <span class="info-label">Address</span> U7, 39 Edinburgh Road, WA, 6058, Australia
             </div>
         </div>
     </div>
@@ -324,10 +328,10 @@
         <thead>
             <tr>
                 <th class="desc-col">DESCRIPTION</th>
-                <th class="price-col">PRICE</th>
+                <th class="price-col">PRICE ($)</th>
                 <th class="qty-col">QUANTITY</th>
                 <th class="gst-col">GST %</th>
-                <th class="amount-col">AMOUNT</th>
+                <th class="amount-col">AMOUNT (AUD $)</th>
             </tr>
         </thead>
         <tbody>
@@ -356,8 +360,8 @@
     
     <div class="totals-section">
         <div class="grand-total">
-            <span class="totals-label">TOTAL</span>
-            <span class="totals-value">{{ estimate.grand_total|floatformat:2 }}</span>
+            <span class="totals-label">TOTAL (AUD)</span>
+            <span class="totals-value">${{ estimate.grand_total|floatformat:2 }}</span>
         </div>
     </div>
     

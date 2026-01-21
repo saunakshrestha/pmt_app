@@ -74,12 +74,18 @@ def create_estimate(request, estimate_id=None):
 
             grand_total = subtotal + gst_total
 
+            # Generate estimate number if not provided
+            estimate_number = form.cleaned_data["number"]
+            if not estimate_number:
+                now = timezone.now()
+                estimate_number = now.strftime("%y%m%d%H%M")
+
             # Session data for preview
             estimate_data = {
                 "customer_name": form.cleaned_data["customer_name"],
                 "customer_abn": form.cleaned_data["customer_abn"],
                 "company_abn": form.cleaned_data.get("company_abn", "79 690 649 515"),
-                "number": form.cleaned_data["number"] or "DRAFT",
+                "number": estimate_number,
                 "date": form.cleaned_data["date"].isoformat() if form.cleaned_data["date"] else None,
                 "valid_until": form.cleaned_data["valid_until"].isoformat() if form.cleaned_data["valid_until"] else None,
                 "summary": form.cleaned_data["summary"],  # HTML content
@@ -111,12 +117,9 @@ def create_estimate(request, estimate_id=None):
                 else:
                     # Create new estimate
                     estimate = form.save(commit=False)
+                    # Use the number we already generated for the session
                     if not estimate.number:
-                        max_num = Estimate.objects.aggregate(max_num=Max("number"))["max_num"]
-                        if max_num and max_num.isdigit():
-                            estimate.number = str(int(max_num) + 1)
-                        else:
-                            estimate.number = "2025001"
+                        estimate.number = estimate_data["number"]
                 
                 estimate.subtotal = subtotal
                 estimate.gst_total = gst_total
@@ -151,12 +154,9 @@ def create_estimate(request, estimate_id=None):
                 else:
                     # Create new estimate
                     estimate = form.save(commit=False)
+                    # Use the number we already generated for the session
                     if not estimate.number:
-                        max_num = Estimate.objects.aggregate(max_num=Max("number"))["max_num"]
-                        if max_num and max_num.isdigit():
-                            estimate.number = str(int(max_num) + 1)
-                        else:
-                            estimate.number = "2025001"
+                        estimate.number = estimate_data["number"]
                 
                 estimate.subtotal = subtotal
                 estimate.gst_total = gst_total
@@ -233,7 +233,7 @@ def save_estimate_from_preview(request):
         customer_name=data["customer_name"],
         customer_abn=data["customer_abn"],
         company_abn=data.get("company_abn", "79 690 649 515"),
-        number=data["number"] if data["number"] != "DRAFT" else None,
+        number=data["number"],
         date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
         valid_until=date.fromisoformat(data["valid_until"]) if data.get("valid_until") and isinstance(data["valid_until"], str) else data.get("valid_until"),
         summary=data["summary"],
@@ -243,13 +243,6 @@ def save_estimate_from_preview(request):
         gst_total=Decimal(str(data["gst_total"])),
         grand_total=Decimal(str(data["grand_total"]))
     )
-    
-    if not estimate.number:
-        max_num = Estimate.objects.aggregate(max_num=Max("number"))["max_num"]
-        if max_num and max_num.isdigit():
-            estimate.number = str(int(max_num) + 1)
-        else:
-            estimate.number = "2025001"
     
     estimate.save()
     
