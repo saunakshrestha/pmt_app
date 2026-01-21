@@ -318,10 +318,10 @@ def create_invoice(request, invoice_id=None):
                     continue
                 qty = int(request.POST.get(f"item_{i}_quantity", 1))
                 unit_price = Decimal(request.POST.get(f"item_{i}_unit_price", "0"))
-                gst_rate = Decimal(request.POST.get(f"item_{i}_gst_rate", "0.1"))
+                gst_rate = Decimal(request.POST.get(f"item_{i}_gst_rate", "10"))
                 
                 line_sub = qty * unit_price
-                line_gst = line_sub * gst_rate
+                line_gst = line_sub * (gst_rate / 100)
                 items.append({
                     "description": desc,
                     "quantity": qty,
@@ -334,6 +334,12 @@ def create_invoice(request, invoice_id=None):
 
             grand_total = subtotal + gst_total
 
+            # Generate invoice number if not provided
+            invoice_number = form.cleaned_data["number"]
+            if not invoice_number:
+                now = timezone.now()
+                invoice_number = now.strftime("%y%m%d%H%M")
+
             # Session data for preview
             invoice_data = {
                 "customer_name": form.cleaned_data["customer_name"],
@@ -341,7 +347,7 @@ def create_invoice(request, invoice_id=None):
                 "customer_address": form.cleaned_data["customer_address"],
                 "customer_abn": form.cleaned_data["customer_abn"],
                 "company_abn": form.cleaned_data.get("company_abn", "79 690 649 515"),
-                "number": form.cleaned_data["number"] or "DRAFT",
+                "number": invoice_number,
                 "date": form.cleaned_data["date"].isoformat() if form.cleaned_data["date"] else None,
                 "due_date": form.cleaned_data["due_date"].isoformat() if form.cleaned_data["due_date"] else None,
                 "po_reference": form.cleaned_data["po_reference"],
@@ -371,15 +377,9 @@ def create_invoice(request, invoice_id=None):
                 else:
                     # Create new invoice
                     invoice = form.save(commit=False)
+                    # Use the number we already generated for the session
                     if not invoice.number:
-                        year = invoice.date.year if invoice.date else timezone.now().year
-                        max_seq = Invoice.objects.filter(number__startswith=f"MO-{year}-").aggregate(
-                            max_seq=Max("number"))["max_seq"]
-                        if max_seq:
-                            seq = int(max_seq.split("-")[-1]) + 1
-                        else:
-                            seq = 1
-                        invoice.number = f"MO-{year}-{seq:02d}"
+                        invoice.number = invoice_data["number"]
                 
                 invoice.subtotal = subtotal
                 invoice.gst_total = gst_total
@@ -414,15 +414,9 @@ def create_invoice(request, invoice_id=None):
                 else:
                     # Create new invoice
                     invoice = form.save(commit=False)
+                    # Use the number we already generated for the session
                     if not invoice.number:
-                        year = invoice.date.year if invoice.date else timezone.now().year
-                        max_seq = Invoice.objects.filter(number__startswith=f"MO-{year}-").aggregate(
-                            max_seq=Max("number"))["max_seq"]
-                        if max_seq:
-                            seq = int(max_seq.split("-")[-1]) + 1
-                        else:
-                            seq = 1
-                        invoice.number = f"MO-{year}-{seq:02d}"
+                        invoice.number = invoice_data["number"]
                 
                 invoice.subtotal = subtotal
                 invoice.gst_total = gst_total
@@ -502,23 +496,13 @@ def save_invoice_from_preview(request):
         attention=data["attention"],
         po_reference=data["po_reference"],
         company_abn=data.get("company_abn", "79 690 649 515"),
-        number=data["number"] if data["number"] != "DRAFT" else None,
+        number=data["number"],
         date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
         due_date=date.fromisoformat(data["due_date"]) if data.get("due_date") and isinstance(data["due_date"], str) else data.get("due_date"),
         subtotal=Decimal(str(data["subtotal"])),
         gst_total=Decimal(str(data["gst_total"])),
         grand_total=Decimal(str(data["grand_total"]))
     )
-    
-    if not invoice.number:
-        year = invoice.date.year if invoice.date else timezone.now().year
-        max_seq = Invoice.objects.filter(number__startswith=f"MO-{year}-").aggregate(
-            max_seq=Max("number"))["max_seq"]
-        if max_seq:
-            seq = int(max_seq.split("-")[-1]) + 1
-        else:
-            seq = 1
-        invoice.number = f"MO-{year}-{seq:02d}"
     
     invoice.save()
     

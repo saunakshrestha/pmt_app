@@ -113,33 +113,23 @@
             margin: 10px 0 15px 0;
         }
         .info-container {
-            display: table;
+            display: flex;
             width: 100%;
             margin-bottom: 15px;
-        }
-        .info-left {
-            display: table-cell;
-            vertical-align: top;
-            width: 50%;
-            padding-right: 15px;
-        }
-        .info-right {
-            display: table-cell;
-            vertical-align: top;
-            width: 50%;
-        }
-        .info-right-inner {
-            display: table;
-            width: 100%;
+            justify-content: center;
+            gap: 15px;
         }
         .info-column {
-            display: table-cell;
+            flex: 1;
             vertical-align: top;
-            width: 50%;
-            padding-left: 10px;
+            display: flex;
+            flex-direction: column;
         }
-        .info-column:first-child {
-            padding-left: 0;
+        .section-title {
+            font-weight: bold;
+            font-size: 9pt;
+            margin-bottom: 5px;
+            color: #000000;
         }
         .info-box {
             background-color: transparent;
@@ -155,12 +145,14 @@
         }
         .customer-box {
             background-color: #ffffff;
+            border: 1px solid #e0e0e0;
             padding: 3px 6px;
             margin: 1px 0;
             font-weight: bold;
         }
         .highlight-box {
             background-color: #ffffff;
+            border: 1px solid #e0e0e0;
             padding: 3px 6px;
             margin: 1px 0;
         }
@@ -270,37 +262,33 @@
     <div class="doc-title">TAX INVOICE</div>
     
     <div class="info-container">
-        <!-- Left Side: Customer Details -->
-        <div class="info-left">
+        <!-- Column 1: Customer Details -->
+        <div class="info-column">
+            <div class="section-title">Billed To:</div>
             <div class="customer-box">{{ invoice.customer_name }}</div>
             <div class="info-box"><strong>Attention:</strong> {{ invoice.attention }}</div>
             <div class="info-box">{{ invoice.customer_address|linebreaksbr }}</div>
             <div class="info-box"><strong>ABN:</strong> {{ invoice.customer_abn|default:"-" }}</div>
         </div>
         
-        <!-- Right Side: Invoice Details + Company Details -->
-        <div class="info-right">
-            <div class="info-right-inner">
-                <!-- Invoice Details Column -->
-                <div class="info-column">
-                    <div class="info-box"><strong>Invoice Date</strong></div>
-                    <div class="info-box">{{ invoice.date|date:"d M Y" }}</div>
-                    <div class="highlight-box"><strong>Invoice Number</strong></div>
-                    <div class="info-box">{{ invoice.number }}</div>
-                    <div class="highlight-box"><strong>Reference/PO #</strong></div>
-                    <div class="info-box">{{ invoice.po_reference|default:"-" }}</div>
-                    <div class="info-box" style="margin-top: 5px;"><strong>ABN</strong></div>
-                    <div class="info-box">{{ invoice.company_abn|default:"79 690 649 515" }}</div>
-                </div>
-                
-                <!-- Company Details Column -->
-                <div class="info-column">
-                    <div class="info-box" style="font-weight: bold; font-size: 9pt;">MochaTech Pty Ltd</div>
-                    <div class="info-box">U7, 39 Edinburgh Road</div>
-                    <div class="info-box">WA, 6058.</div>
-                    <div class="info-box">Australia</div>
-                </div>
-            </div>
+        <!-- Column 2: Invoice Details -->
+        <div class="info-column">
+            <div class="info-box"><strong>Invoice Date</strong></div>
+            <div class="info-box">{{ invoice.date|date:"d M Y" }}</div>
+            <div class="highlight-box"><strong>Invoice Number</strong></div>
+            <div class="info-box">{{ invoice.number }}</div>
+            <div class="highlight-box"><strong>Reference/PO #</strong></div>
+            <div class="info-box">{{ invoice.po_reference|default:"-" }}</div>
+        </div>
+        
+        <!-- Column 3: Company Details -->
+        <div class="info-column">
+            <div class="section-title">From:</div>
+            <div class="info-box" style="font-weight: bold; font-size: 9pt;">MochaTech Pty Ltd</div>
+            <div class="info-box">U7, 39 Edinburgh Road</div>
+            <div class="info-box">WA, 6058.</div>
+            <div class="info-box">Australia</div>
+            <div class="info-box" style="margin-top: 5px;"><strong>ABN:</strong> {{ invoice.company_abn|default:"79 690 649 515" }}</div>
         </div>
     </div>
     
@@ -310,7 +298,7 @@
                 <th class="desc-col">Description</th>
                 <th class="qty-col">Quantity</th>
                 <th class="price-col">Unit price</th>
-                <th class="gst-col">GST rate</th>
+                <th class="gst-col">GST rate (%)</th>
                 <th class="amount-col">Total price AUD</th>
             </tr>
         </thead>
@@ -320,7 +308,7 @@
                     <td class="desc-col">{{ item.description }}</td>
                     <td class="qty-col">{{ item.quantity }}</td>
                     <td class="price-col">{{ item.unit_price }}</td>
-                    <td class="gst-col">{{ item.gst_rate }}</td>
+                    <td class="gst-col">{{ item.gst_rate }}%</td>
                     <td class="amount-col">{{ item.line_total_inc_gst|floatformat:2 }}</td>
                 </tr>
             {% endfor %}
