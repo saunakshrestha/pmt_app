@@ -246,7 +246,7 @@
                 {% for item in document.items %}
                     <tr>
                         <td class="desc-col">{{ item.description }}</td>
-                        <td class="qty-col">{{ item.quantity }}</td>
+                        <td class="qty-col">{{ item.quantity|smart_number }}</td>
                         <td class="price-col">{{ item.unit_price }}</td>
                         <td class="gst-col">{{ item.gst_rate|floatformat:1 }}</td>
                         <td class="amount-col">{{ item.amount }}</td>
@@ -354,7 +354,7 @@
                     <tr>
                         <td class="desc-col">{{ item.description }}</td>
                         <td class="price-col">{{ item.unit_price }}</td>
-                        <td class="qty-col">{{ item.quantity }}</td>
+                        <td class="qty-col">{{ item.quantity|smart_number }}</td>
                         <td class="gst-col">{{ item.gst_rate|floatformat:0 }}</td>
                         <td class="amount-col">{{ item.amount }}</td>
                     </tr>

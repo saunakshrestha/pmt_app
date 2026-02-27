@@ -11,6 +11,27 @@ class EstimateForm(forms.ModelForm):
         # Make all fields optional
         for field in self.fields.values():
             field.required = False
+        
+        # Make number field read-only when editing
+        if self.instance and self.instance.pk:
+            self.fields['number'].widget.attrs['readonly'] = True
+            self.fields['number'].help_text = 'Number cannot be changed when editing'
+    
+    def clean_number(self):
+        """Validate number field, excluding current instance when editing"""
+        number = self.cleaned_data.get('number')
+        if not number:
+            return number
+        
+        # Check for duplicates, excluding current instance
+        queryset = Estimate.objects.filter(number=number)
+        if self.instance and self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        
+        if queryset.exists():
+            raise forms.ValidationError(f'Estimate with number "{number}" already exists.')
+        
+        return number
     
     class Meta:
         model = Estimate
@@ -61,6 +82,27 @@ class InvoiceForm(forms.ModelForm):
         # Make all fields optional
         for field in self.fields.values():
             field.required = False
+        
+        # Make number field read-only when editing
+        if self.instance and self.instance.pk:
+            self.fields['number'].widget.attrs['readonly'] = True
+            self.fields['number'].help_text = 'Number cannot be changed when editing'
+    
+    def clean_number(self):
+        """Validate number field, excluding current instance when editing"""
+        number = self.cleaned_data.get('number')
+        if not number:
+            return number
+        
+        # Check for duplicates, excluding current instance
+        queryset = Invoice.objects.filter(number=number)
+        if self.instance and self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        
+        if queryset.exists():
+            raise forms.ValidationError(f'Invoice with number "{number}" already exists.')
+        
+        return number
     
     class Meta:
         model = Invoice

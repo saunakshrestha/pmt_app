@@ -304,7 +304,7 @@
             {% for item in invoice.items %}
                 <tr>
                     <td class="desc-col">{{ item.description }}</td>
-                    <td class="qty-col">{{ item.quantity }}</td>
+                    <td class="qty-col">{{ item.quantity|smart_number }}</td>
                     <td class="price-col">{{ item.unit_price }}</td>
                     <td class="gst-col">{{ item.gst_rate }}%</td>
                     <td class="amount-col">{{ item.line_total_inc_gst|floatformat:2 }}</td>

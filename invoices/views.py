@@ -42,9 +42,12 @@ def create_estimate(request, estimate_id=None):
     if estimate_id:
         estimate_instance = Estimate.objects.get(id=estimate_id)
         existing_items = EstimateItem.objects.filter(estimate=estimate_instance)
+        # Clear any old session data when starting to edit
+        request.session.pop('temp_estimate', None)
+        request.session.pop('estimate_saved', None)
     
     if request.method == "POST":
-        form = EstimateForm(request.POST)
+        form = EstimateForm(request.POST, instance=estimate_instance)
         if form.is_valid():
             # Collect items
             item_count = int(request.POST.get("item_count", 0))
@@ -56,7 +59,7 @@ def create_estimate(request, estimate_id=None):
                 desc = request.POST.get(f"item_{i}_description")
                 if not desc:
                     continue
-                qty = int(request.POST.get(f"item_{i}_quantity", 1))
+                qty = Decimal(request.POST.get(f"item_{i}_quantity", "1"))
                 unit_price = Decimal(request.POST.get(f"item_{i}_unit_price", "0"))
                 gst_rate = Decimal(request.POST.get(f"item_{i}_gst_rate", "10"))
                 
@@ -64,7 +67,7 @@ def create_estimate(request, estimate_id=None):
                 line_gst = line_sub * (gst_rate / 100)
                 items.append({
                     "description": desc,
-                    "quantity": qty,
+                    "quantity": float(qty),
                     "unit_price": float(unit_price),
                     "gst_rate": float(gst_rate),
                     "line_total_inc_gst": float(line_sub + line_gst),
@@ -82,6 +85,7 @@ def create_estimate(request, estimate_id=None):
 
             # Session data for preview
             estimate_data = {
+                "id": estimate_instance.id if estimate_instance else None,  # Track if editing
                 "customer_name": form.cleaned_data["customer_name"],
                 "customer_abn": form.cleaned_data["customer_abn"],
                 "company_abn": form.cleaned_data.get("company_abn", "79 690 649 515"),
@@ -228,23 +232,48 @@ def save_estimate_from_preview(request):
         messages.warning(request, "No data - create estimate first.")
         return redirect("create_estimate")
     
-    # Save to database
-    estimate = Estimate(
-        customer_name=data["customer_name"],
-        customer_abn=data["customer_abn"],
-        company_abn=data.get("company_abn", "79 690 649 515"),
-        number=data["number"],
-        date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
-        valid_until=date.fromisoformat(data["valid_until"]) if data.get("valid_until") and isinstance(data["valid_until"], str) else data.get("valid_until"),
-        summary=data["summary"],
-        terms_conditions=data["terms_conditions"],
-        payment_terms=data["payment_terms"],
-        subtotal=Decimal(str(data["subtotal"])),
-        gst_total=Decimal(str(data["gst_total"])),
-        grand_total=Decimal(str(data["grand_total"]))
-    )
-    
-    estimate.save()
+    # Check if editing existing estimate
+    estimate_id = data.get("id")
+    if estimate_id:
+        # Update existing estimate
+        try:
+            estimate = Estimate.objects.get(id=estimate_id)
+            estimate.customer_name = data["customer_name"]
+            estimate.customer_abn = data["customer_abn"]
+            estimate.company_abn = data.get("company_abn", "79 690 649 515")
+            estimate.number = data["number"]
+            estimate.date = date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date")
+            estimate.valid_until = date.fromisoformat(data["valid_until"]) if data.get("valid_until") and isinstance(data["valid_until"], str) else data.get("valid_until")
+            estimate.summary = data["summary"]
+            estimate.terms_conditions = data["terms_conditions"]
+            estimate.payment_terms = data["payment_terms"]
+            estimate.subtotal = Decimal(str(data["subtotal"]))
+            estimate.gst_total = Decimal(str(data["gst_total"]))
+            estimate.grand_total = Decimal(str(data["grand_total"]))
+            estimate.save()
+            
+            # Delete old items and create new ones
+            EstimateItem.objects.filter(estimate=estimate).delete()
+        except Estimate.DoesNotExist:
+            messages.error(request, "Estimate not found!")
+            return redirect("create_estimate")
+    else:
+        # Create new estimate
+        estimate = Estimate(
+            customer_name=data["customer_name"],
+            customer_abn=data["customer_abn"],
+            company_abn=data.get("company_abn", "79 690 649 515"),
+            number=data["number"],
+            date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
+            valid_until=date.fromisoformat(data["valid_until"]) if data.get("valid_until") and isinstance(data["valid_until"], str) else data.get("valid_until"),
+            summary=data["summary"],
+            terms_conditions=data["terms_conditions"],
+            payment_terms=data["payment_terms"],
+            subtotal=Decimal(str(data["subtotal"])),
+            gst_total=Decimal(str(data["gst_total"])),
+            grand_total=Decimal(str(data["grand_total"]))
+        )
+        estimate.save()
     
     # Save items
     for item_data in data["items"]:
@@ -295,9 +324,12 @@ def create_invoice(request, invoice_id=None):
     if invoice_id:
         invoice_instance = Invoice.objects.get(id=invoice_id)
         existing_items = InvoiceItem.objects.filter(invoice=invoice_instance)
+        # Clear any old session data when starting to edit
+        request.session.pop('temp_invoice', None)
+        request.session.pop('invoice_saved', None)
     
     if request.method == "POST":
-        form = InvoiceForm(request.POST)
+        form = InvoiceForm(request.POST, instance=invoice_instance)
         if form.is_valid():
             # Collect items
             item_count = int(request.POST.get("item_count", 0))
@@ -309,7 +341,7 @@ def create_invoice(request, invoice_id=None):
                 desc = request.POST.get(f"item_{i}_description")
                 if not desc:
                     continue
-                qty = int(request.POST.get(f"item_{i}_quantity", 1))
+                qty = Decimal(request.POST.get(f"item_{i}_quantity", "1"))
                 unit_price = Decimal(request.POST.get(f"item_{i}_unit_price", "0"))
                 gst_rate = Decimal(request.POST.get(f"item_{i}_gst_rate", "10"))
                 
@@ -317,7 +349,7 @@ def create_invoice(request, invoice_id=None):
                 line_gst = line_sub * (gst_rate / 100)
                 items.append({
                     "description": desc,
-                    "quantity": qty,
+                    "quantity": float(qty),
                     "unit_price": float(unit_price),
                     "gst_rate": float(gst_rate),
                     "line_total_inc_gst": float(line_sub + line_gst),
@@ -335,6 +367,7 @@ def create_invoice(request, invoice_id=None):
 
             # Session data for preview
             invoice_data = {
+                "id": invoice_instance.id if invoice_instance else None,  # Track if editing
                 "customer_name": form.cleaned_data["customer_name"],
                 "attention": form.cleaned_data["attention"],
                 "customer_address": form.cleaned_data["customer_address"],
@@ -481,23 +514,48 @@ def save_invoice_from_preview(request):
         messages.warning(request, "No data - create invoice first.")
         return redirect("create_invoice")
     
-    # Save to database
-    invoice = Invoice(
-        customer_name=data["customer_name"],
-        customer_abn=data["customer_abn"],
-        customer_address=data["customer_address"],
-        attention=data["attention"],
-        po_reference=data["po_reference"],
-        company_abn=data.get("company_abn", "79 690 649 515"),
-        number=data["number"],
-        date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
-        due_date=date.fromisoformat(data["due_date"]) if data.get("due_date") and isinstance(data["due_date"], str) else data.get("due_date"),
-        subtotal=Decimal(str(data["subtotal"])),
-        gst_total=Decimal(str(data["gst_total"])),
-        grand_total=Decimal(str(data["grand_total"]))
-    )
-    
-    invoice.save()
+    # Check if editing existing invoice
+    invoice_id = data.get("id")
+    if invoice_id:
+        # Update existing invoice
+        try:
+            invoice = Invoice.objects.get(id=invoice_id)
+            invoice.customer_name = data["customer_name"]
+            invoice.customer_abn = data["customer_abn"]
+            invoice.customer_address = data["customer_address"]
+            invoice.attention = data["attention"]
+            invoice.po_reference = data["po_reference"]
+            invoice.company_abn = data.get("company_abn", "79 690 649 515")
+            invoice.number = data["number"]
+            invoice.date = date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date")
+            invoice.due_date = date.fromisoformat(data["due_date"]) if data.get("due_date") and isinstance(data["due_date"], str) else data.get("due_date")
+            invoice.subtotal = Decimal(str(data["subtotal"]))
+            invoice.gst_total = Decimal(str(data["gst_total"]))
+            invoice.grand_total = Decimal(str(data["grand_total"]))
+            invoice.save()
+            
+            # Delete old items and create new ones
+            InvoiceItem.objects.filter(invoice=invoice).delete()
+        except Invoice.DoesNotExist:
+            messages.error(request, "Invoice not found!")
+            return redirect("create_invoice")
+    else:
+        # Create new invoice
+        invoice = Invoice(
+            customer_name=data["customer_name"],
+            customer_abn=data["customer_abn"],
+            customer_address=data["customer_address"],
+            attention=data["attention"],
+            po_reference=data["po_reference"],
+            company_abn=data.get("company_abn", "79 690 649 515"),
+            number=data["number"],
+            date=date.fromisoformat(data["date"]) if data.get("date") and isinstance(data["date"], str) else data.get("date"),
+            due_date=date.fromisoformat(data["due_date"]) if data.get("due_date") and isinstance(data["due_date"], str) else data.get("due_date"),
+            subtotal=Decimal(str(data["subtotal"])),
+            gst_total=Decimal(str(data["gst_total"])),
+            grand_total=Decimal(str(data["grand_total"]))
+        )
+        invoice.save()
     
     # Save items
     for item_data in data["items"]:
@@ -593,14 +651,14 @@ def create_document(request):
                 desc = request.POST.get(f"{prefix}description")
                 if not desc:
                     continue
-                qty = int(request.POST.get(f"{prefix}quantity", 1))
+                qty = Decimal(request.POST.get(f"{prefix}quantity", "1"))
                 unit_price = Decimal(request.POST.get(f"{prefix}unit_price", "0"))
                 gst_rate = Decimal(request.POST.get(f"{prefix}gst_rate", "10"))
                 line_sub = qty * unit_price
                 line_gst = line_sub * (gst_rate / 100)
                 items.append({
                     "description": desc,
-                    "quantity": qty,
+                    "quantity": str(qty),
                     "unit_price": str(unit_price),
                     "gst_rate": str(gst_rate),
                     "amount": str(line_sub + line_gst),
